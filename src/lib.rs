@@ -1,17 +1,17 @@
-use std::error::Error;
-
-pub struct Config {
-    pub file: String,
+#[derive(Debug)]
+pub struct Parameter {
+    pub name: String,
+    pub variations: Vec<String>,
 }
 
-impl Config {
-    pub fn new(name: String) -> Result<Config, Box<dyn Error>> {
-        let filename = name;
+impl Parameter {
+    pub fn new(word: String, var: Vec<String>) -> Result<Parameter, &'static str> {
+        if var.len() <= 0 {
+            return Err("not enough arguments")
+        }
+        let name = word;
+        let variations = var;
 
-        Ok(Config{file: filename})
+        Ok(Parameter {name, variations})
     }
-}
-
-pub fn run(config: Config) {
-    println!("{}", config.file);
 }
