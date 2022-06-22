@@ -1,4 +1,4 @@
-use template;
+use morphbox;
 
 #[test]
 fn test_test() {

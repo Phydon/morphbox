@@ -1,6 +1,6 @@
 use std::process;
 
-use template::*;
+use morphbox::*;
 
 fn main() {
     println!("Hello World!");
@@ -9,5 +9,5 @@ fn main() {
         process::exit(1);
     });
 
-    template::run(conf);
+    morphbox::run(conf);
 }
