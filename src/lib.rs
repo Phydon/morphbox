@@ -5,13 +5,13 @@ pub struct Parameter {
 }
 
 impl Parameter {
-    pub fn new(word: String, var: Vec<String>) -> Result<Parameter, &'static str> {
+    pub fn new(word: String, var: Vec<String>) -> Parameter {
         if var.len() <= 0 {
-            return Err("not enough arguments")
+            panic!("Not enough arguments")
         }
         let name = word;
         let variations = var;
 
-        Ok(Parameter {name, variations})
+        Parameter {name, variations}
     }
 }
