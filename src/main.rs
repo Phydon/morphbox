@@ -1,9 +1,10 @@
 use morphbox::*;
 
 fn main() {
-    let args: Vec<String> = vec!["Some".to_string(), "Thing".to_string()];
+    let parameter_name = input();
+    let args = input_variations();
 
-    let param = Parameter::new("NewName".to_string(), args);
+    let param = Parameter::new(parameter_name, args);
 
     println!("param: {:?}", param);
     println!("name: {:?}", param.name);

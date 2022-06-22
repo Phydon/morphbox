@@ -1,3 +1,5 @@
+use std::io;
+
 #[derive(Debug)]
 pub struct Parameter {
     pub name: String,
@@ -13,5 +15,32 @@ impl Parameter {
         let variations = var;
 
         Parameter {name, variations}
+    }
+}
+
+pub fn input() -> String {
+    loop {
+        println!("Enter a parameter: ");
+
+        let mut inp = String::new();
+        io::stdin().read_line(&mut inp).expect("Failed to read input");
+
+        return inp.trim().to_string()
+    }
+}
+
+pub fn input_variations() -> Vec<String> {
+    let mut container: Vec<String> = Vec::new();
+    loop {
+        println!("Enter \"Q\" when you`re done");
+        println!("Enter a variation: ");
+
+        let mut inp = String::new();
+        io::stdin().read_line(&mut inp).expect("Failed to read input");
+
+        match inp.trim() {
+            "q" | "Q" => return container,
+            _ => container.push(inp.trim().to_string()),
+        }
     }
 }
