@@ -1,4 +1,7 @@
-use std::io;
+use std::{
+    io,
+    collections::BTreeMap,
+};
 
 #[derive(Debug)]
 pub struct Parameter {
@@ -19,14 +22,13 @@ impl Parameter {
 }
 
 pub fn input() -> String {
-    loop {
+        println!("Enter \"Q\" when you`re done");
         println!("Enter a parameter: ");
 
         let mut inp = String::new();
         io::stdin().read_line(&mut inp).expect("Failed to read input");
 
         return inp.trim().to_string()
-    }
 }
 
 pub fn input_variations() -> Vec<String> {
@@ -44,3 +46,5 @@ pub fn input_variations() -> Vec<String> {
         }
     }
 }
+
+

@@ -1,12 +1,23 @@
 use morphbox::*;
 
 fn main() {
-    let parameter_name = input();
-    let args = input_variations();
+    let mut parameters: Vec<Parameter> = Vec::new();
 
-    let param = Parameter::new(parameter_name, args);
+    loop {
+        let parameter_name: String = input();
+        match parameter_name.as_str() {
+            "q" | "Q" => break,
+            _ => (),
+        };
 
-    println!("param: {:?}", param);
-    println!("name: {:?}", param.name);
-    println!("variations: {:?}", param.variations);
+        let variations: Vec<String> = input_variations();
+
+        let param = Parameter::new(parameter_name, variations);
+        parameters.push(param);
+    };
+
+    for param in parameters {
+        println!("name: {:?}", param.name);
+        println!("variations: {:?}", param.variations);
+    }
 }
