@@ -1,7 +1,7 @@
 #[macro_use] 
 extern crate prettytable;
 
-use prettytable::{Table, Row, Attr, Cell, color, format};
+use prettytable::{Table, Row, Cell, format};
 use chrono::Local;
 
 use std::{
@@ -56,40 +56,6 @@ pub fn input_variations() -> Vec<String> {
     }
 }
 
-pub fn create_table(container: BTreeMap<String, Vec<String>>) -> Table {
-    let datetime = Local::now().to_string();
-    let mut idx: i32 = 0;
-    let mut table = Table::new();
-
-    table.set_format(*format::consts::FORMAT_BOX_CHARS);
-    table.set_titles(Row::new(vec![
-            Cell::new(&datetime)
-                .with_style(Attr::ForegroundColor(color::RED))
-                .with_hspan(3)]));
-    table.add_row(row![FdBwbl->"Index", FdBwbc->"Parameter", FdBwbc->"Variations"]);
-
-    for (key, values) in &container {
-        let mut temp_str: String = String::new();
-        for value in values {
-            temp_str = temp_str + value + &" | ".to_string(); 
-        }
-        table.add_row(row![idx, Fb->key, c->temp_str]);
-        idx += 1;
-    }
-
-    table
-}
-
-pub fn write_to_file(content: &Table) -> io::Result<()> {
-    let mut file = fs::OpenOptions::new()
-        .append(true)
-        .create(true)
-        .open(FILEPATH)?;
-
-    writeln!(file, "{}", content)?;
-    Ok(())
-    }
-
 pub fn cycle_inputs() -> Vec<Parameter> {
     let mut parameters: Vec<Parameter> = Vec::new();
 
@@ -109,6 +75,32 @@ pub fn cycle_inputs() -> Vec<Parameter> {
     parameters
 }
 
+pub fn create_table(container: BTreeMap<String, Vec<String>>) -> Table {
+    let datetime = Local::now().to_string();
+    let mut idx: i32 = 0;
+    let mut table = Table::new();
+
+    table.set_format(*format::consts::FORMAT_BOX_CHARS);
+    table.set_titles(Row::new(vec![
+            Cell::new("MORPHBOX")
+                .style_spec("FrBdH3bc")]));
+    table.add_row(Row::new(vec![
+            Cell::new(&datetime)
+                .style_spec("FcH3ic")]));
+    table.add_row(row![FdBwl->"INDEX", FdBwc->"PARAMETER", FdBwc->"VARIATIONS"]);
+
+    for (key, values) in &container {
+        let mut temp_str: String = String::new();
+        for value in values {
+            temp_str = temp_str + value + &" | ".to_string(); 
+        }
+        table.add_row(row![Fy->idx, b->key, c->temp_str]);
+        idx += 1;
+    }
+
+    table
+}
+
 pub fn create_container(parameters: Vec<Parameter>) -> BTreeMap<String, Vec<String>> {
     let mut container: BTreeMap<_,_> = BTreeMap::new();
 
@@ -118,6 +110,16 @@ pub fn create_container(parameters: Vec<Parameter>) -> BTreeMap<String, Vec<Stri
 
     container
 }
+
+pub fn write_to_file(content: &Table) -> io::Result<()> {
+    let mut file = fs::OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open(FILEPATH)?;
+
+    writeln!(file, "{}", content)?;
+    Ok(())
+    }
 
 pub fn are_u_done(table: &Table) -> bool {
     loop {
