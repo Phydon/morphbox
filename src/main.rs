@@ -1,23 +1,34 @@
+use prettytable::Table;
+
+use std::{
+    collections::BTreeMap,
+    process,
+};
+
 use morphbox::*;
 
 fn main() {
-    let mut parameters: Vec<Parameter> = Vec::new();
-
     loop {
-        let parameter_name: String = input();
-        match parameter_name.as_str() {
-            "q" | "Q" => break,
-            _ => (),
-        };
+        let parameters: Vec<Parameter> = cycle_inputs();
+        // for param in &parameters {
+        //     println!("name: {}", param.name);
+        //     println!("variations: {:?}", param.variations);
+        // }
 
-        let variations: Vec<String> = input_variations();
+        let container: BTreeMap<String,Vec<String>> = create_container(parameters);
+        // for (key, value) in container {
+        //     println!("key: {key}");
+        //     println!("value: {:?}", value);
+        // }
 
-        let param = Parameter::new(parameter_name, variations);
-        parameters.push(param);
-    };
+        let table: Table = create_table(container);
 
-    for param in parameters {
-        println!("name: {:?}", param.name);
-        println!("variations: {:?}", param.variations);
+        let done = are_u_done(&table);
+        if done {
+            write_to_file(&table).expect("Failed to write to file");
+            break;
+        }
     }
+
+    process::exit(0);
 }

@@ -1,7 +1,16 @@
+#[macro_use] 
+extern crate prettytable;
+
+use prettytable::{Table, Row, Attr, Cell, color, format};
+use chrono::Local;
+
 use std::{
-    io,
+    io::{self, Write},
+    fs,
     collections::BTreeMap,
 };
+
+const FILEPATH: &str = "./mymorphbox.txt";
 
 #[derive(Debug)]
 pub struct Parameter {
@@ -47,4 +56,85 @@ pub fn input_variations() -> Vec<String> {
     }
 }
 
+pub fn create_table(container: BTreeMap<String, Vec<String>>) -> Table {
+    let datetime = Local::now().to_string();
+    let mut idx: i32 = 0;
+    let mut table = Table::new();
 
+    table.set_format(*format::consts::FORMAT_BOX_CHARS);
+    table.set_titles(Row::new(vec![
+            Cell::new(&datetime)
+                .with_style(Attr::ForegroundColor(color::RED))
+                .with_hspan(3)]));
+    table.add_row(row![FdBwbl->"Index", FdBwbc->"Parameter", FdBwbc->"Variations"]);
+
+    for (key, values) in &container {
+        let mut temp_str: String = String::new();
+        for value in values {
+            temp_str = temp_str + value + &" | ".to_string(); 
+        }
+        table.add_row(row![idx, Fb->key, c->temp_str]);
+        idx += 1;
+    }
+
+    table
+}
+
+pub fn write_to_file(content: &Table) -> io::Result<()> {
+    let mut file = fs::OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open(FILEPATH)?;
+
+    writeln!(file, "{}", content)?;
+    Ok(())
+    }
+
+pub fn cycle_inputs() -> Vec<Parameter> {
+    let mut parameters: Vec<Parameter> = Vec::new();
+
+    loop {
+        let parameter_name: String = input();
+        match parameter_name.as_str() {
+            "q" | "Q" => break,
+            _ => (),
+        };
+
+        let variations: Vec<String> = input_variations();
+
+        let param = Parameter::new(parameter_name, variations);
+        parameters.push(param);
+    };
+
+    parameters
+}
+
+pub fn create_container(parameters: Vec<Parameter>) -> BTreeMap<String, Vec<String>> {
+    let mut container: BTreeMap<_,_> = BTreeMap::new();
+
+    for parameter in parameters {
+        container.insert(parameter.name, parameter.variations);
+    }
+
+    container
+}
+
+pub fn are_u_done(table: &Table) -> bool {
+    loop {
+        table.printstd();
+
+        println!("Done?");
+        println!("Press \"Y\" to quit or \"N\" to make changes!");
+
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).expect("Failed to read input");
+
+        match input.trim().to_uppercase().as_str() {
+            "y" | "Y" => return true,
+            "n" | "N" => return false,
+            _ => {
+                println!("Not valid");
+            },
+        }
+    }
+}
