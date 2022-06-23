@@ -9,6 +9,8 @@ use std::{
     fs,
     collections::BTreeMap,
 };
+use itertools::Itertools;
+
 
 const FILEPATH: &str = "./mymorphbox.txt";
 
@@ -75,7 +77,17 @@ pub fn cycle_inputs() -> Vec<Parameter> {
     parameters
 }
 
-pub fn create_table(container: BTreeMap<String, Vec<String>>) -> Table {
+pub fn create_container(parameters: &Vec<Parameter>) -> BTreeMap<&String, &Vec<String>> {
+    let mut container: BTreeMap<_,_> = BTreeMap::new();
+
+    for parameter in parameters {
+        container.insert(&parameter.name, &parameter.variations);
+    }
+
+    container
+}
+
+pub fn create_table(container: BTreeMap<&String, &Vec<String>>) -> Table {
     let datetime = Local::now().to_string();
     let mut idx: i32 = 0;
     let mut table = Table::new();
@@ -91,7 +103,7 @@ pub fn create_table(container: BTreeMap<String, Vec<String>>) -> Table {
 
     for (key, values) in &container {
         let mut temp_str: String = String::new();
-        for value in values {
+        for value in values.into_iter() {
             temp_str = temp_str + value + &" | ".to_string(); 
         }
         table.add_row(row![Fy->idx, b->key, c->temp_str]);
@@ -99,16 +111,6 @@ pub fn create_table(container: BTreeMap<String, Vec<String>>) -> Table {
     }
 
     table
-}
-
-pub fn create_container(parameters: Vec<Parameter>) -> BTreeMap<String, Vec<String>> {
-    let mut container: BTreeMap<_,_> = BTreeMap::new();
-
-    for parameter in parameters {
-        container.insert(parameter.name, parameter.variations);
-    }
-
-    container
 }
 
 pub fn write_to_file(content: &Table) -> io::Result<()> {
@@ -121,10 +123,8 @@ pub fn write_to_file(content: &Table) -> io::Result<()> {
     Ok(())
     }
 
-pub fn are_u_done(table: &Table) -> bool {
+pub fn are_u_done() -> bool {
     loop {
-        table.printstd();
-
         println!("Done?");
         println!("Press \"Y\" to quit or \"N\" to make changes!");
 
@@ -138,5 +138,22 @@ pub fn are_u_done(table: &Table) -> bool {
                 println!("Not valid");
             },
         }
+    }
+}
+
+pub fn combine(lst: Vec<Parameter>) {
+    let mut all_variations: Vec<Vec<String>> = Vec::new();
+
+    for parameter in lst {
+        let var = parameter.variations;
+        all_variations.push(var);
+    }
+
+    let mut multi_prod = all_variations.into_iter().multi_cartesian_product();
+
+    println!("Combinations: ");
+
+    while let Some(n) = multi_prod.next() {
+        println!("{:?}", n);
     }
 }

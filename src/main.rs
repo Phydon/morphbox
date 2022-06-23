@@ -15,7 +15,7 @@ fn main() {
         //     println!("variations: {:?}", param.variations);
         // }
 
-        let container: BTreeMap<String,Vec<String>> = create_container(parameters);
+        let container: BTreeMap<&String,&Vec<String>> = create_container(&parameters);
         // for (key, value) in container {
         //     println!("key: {key}");
         //     println!("value: {:?}", value);
@@ -23,8 +23,10 @@ fn main() {
 
         let table: Table = create_table(container);
 
-        let done = are_u_done(&table);
-        if done {
+        table.printstd();
+        combine(parameters);
+
+        if are_u_done() {
             write_to_file(&table).expect("Failed to write to file");
             break;
         }
