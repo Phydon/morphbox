@@ -88,6 +88,10 @@ pub fn create_container(parameters: &Vec<Parameter>) -> BTreeMap<&String, &Vec<S
 }
 
 pub fn create_table(container: BTreeMap<&String, &Vec<String>>) -> Table {
+    if container.is_empty() {
+        panic!("No arguments given");
+    }
+
     let datetime = Local::now().to_string();
     let mut idx: i32 = 0;
     let mut table = Table::new();
