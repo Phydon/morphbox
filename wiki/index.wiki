@@ -5,7 +5,7 @@
 %date
 = MorphBox =
 
-Morphological Box:: create all possible combinations
+Morphological Box:: create all possible combinations of parameters and their variations
 
 	| idx |    Parameter    | Variations                          |
 	|:----|:---------------:|-------------------------------------|
@@ -20,4 +20,4 @@ Morphological Box:: create all possible combinations
 * [o] 	create [[https://github.com/Phydon/morphbox/blob/master/README.md|README]]
 * [ ]	reduce combinations
 * [ ]	read parameters and their variations from file
-* [ ]	write combinations to file
+* [X]	write combinations to file

@@ -1,5 +1,16 @@
-# morphbox
+# Contents #
+    - [[#MorphBox|MorphBox]]
 
---> morphological box
+# MorphBox #
 
+Morphological Box:: create all possible combinations of parameters and their variations
+
+	| idx |    Parameter    | Variations                          |
+	|:----|:---------------:|-------------------------------------|
+	| 0   | drive mechanism | mechanical, electrical, pneumatical |
+	| 1   |    material     | wood, metal, ceramics               |
+	...
+	..
+	.
+	
 ## work in progress
