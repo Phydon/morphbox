@@ -113,15 +113,19 @@ pub fn create_table(container: BTreeMap<&String, &Vec<String>>) -> Table {
     table
 }
 
-pub fn write_to_file(content: &Table) -> io::Result<()> {
+pub fn write_to_file(table: &Table, lst: &BTreeMap<i64, Vec<String>>) -> io::Result<()> {
     let mut file = fs::OpenOptions::new()
         .append(true)
         .create(true)
         .open(FILEPATH)?;
 
-    writeln!(file, "{}", content)?;
-    Ok(())
+    writeln!(file, "{}", table)?;
+    for (k, v) in lst {
+        writeln!(file, "{}: {:?}", k, v)?;
     }
+
+    Ok(())
+}
 
 pub fn are_u_done() -> bool {
     loop {
@@ -141,7 +145,7 @@ pub fn are_u_done() -> bool {
     }
 }
 
-pub fn combine(lst: Vec<Parameter>) {
+pub fn combine(lst: Vec<Parameter>) -> BTreeMap<i64, Vec<String>>{
     let mut all_variations: Vec<Vec<String>> = Vec::new();
 
     for parameter in lst {
@@ -153,7 +157,13 @@ pub fn combine(lst: Vec<Parameter>) {
 
     println!("Combinations: ");
 
+    let mut comb_container: BTreeMap<_,_> = BTreeMap::new();
+    let mut idx: i64 = 0;
     while let Some(n) = multi_prod.next() {
-        println!("{:?}", n);
+        println!("{}: {:?}", idx, n);
+        comb_container.insert(idx, n);
+        idx += 1;
     }
+
+    comb_container
 }

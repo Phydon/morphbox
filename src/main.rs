@@ -24,10 +24,10 @@ fn main() {
         let table: Table = create_table(container);
 
         table.printstd();
-        combine(parameters);
+        let lst = combine(parameters);
 
         if are_u_done() {
-            write_to_file(&table).expect("Failed to write to file");
+            write_to_file(&table, &lst).expect("Failed to write to file");
             break;
         }
     }
