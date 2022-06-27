@@ -8,6 +8,12 @@ use std::{
 use morphbox::*;
 
 fn main() {
+    // TODO read parameters and variations from a file
+    match read_input_file() {
+        Ok(storage) => todo!(),
+        Err(e) => println!("No input file found: {}", e),
+    };
+
     loop {
         let parameters: Vec<Parameter> = cycle_inputs();
         // for param in &parameters {

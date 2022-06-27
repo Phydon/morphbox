@@ -5,7 +5,7 @@ use prettytable::{Table, Row, Cell, format};
 use chrono::Local;
 
 use std::{
-    io::{self, Write},
+    io::{self, Write, BufReader, Result, prelude::* },
     fs,
     collections::BTreeMap,
 };
@@ -13,6 +13,8 @@ use itertools::Itertools;
 
 
 const FILEPATH: &str = "./mymorphbox.txt";
+// TODO change input file path to ./tests/input_test.txt
+const INPUT_FILE_PATH: &str = "./input_test.txt";
 
 #[derive(Debug)]
 pub struct Parameter {
@@ -76,6 +78,37 @@ pub fn cycle_inputs() -> Vec<Parameter> {
 
     parameters
 }
+
+pub fn read_input_file() -> Result<Vec<String>> {
+    let file = fs::OpenOptions::new()
+        .read(true)
+        .open(INPUT_FILE_PATH)?;
+
+    let reader = BufReader::new(file);
+    let mut storage: Vec<String> = Vec::new();
+
+    for line in reader.lines() {
+        storage.push(line.unwrap());
+    }
+
+    Ok(store)
+}
+
+// TODO
+// pub fn seperat_strings(storage: Vec<String>) -> Vec<Parameter> {
+//     let mut parameters: Vec<Parameter> = Vec::new();
+
+//     for item in storage {
+//         // split string by seperator (" ", ",", "-") into vec
+
+//         let parameter_name: String;
+//         let variations: Vec<String>;
+
+//         let param = Parameter::new(parameter_name, variations);
+//         parameters.push(param);
+        
+//     }
+// }
 
 pub fn create_container(parameters: &Vec<Parameter>) -> BTreeMap<&String, &Vec<String>> {
     let mut container: BTreeMap<_,_> = BTreeMap::new();
