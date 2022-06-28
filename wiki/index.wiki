@@ -19,5 +19,5 @@ Morphological Box:: create all possible combinations of parameters and their var
 * [X] 	create combinations
 * [o] 	create [[https://github.com/Phydon/morphbox/blob/master/README.md|README]]
 * [ ]	reduce combinations
-* [ ]	read parameters and their variations from file
+* [.]	read parameters and their variations from file
 * [X]	write combinations to file

@@ -8,11 +8,14 @@ use std::{
 use morphbox::*;
 
 fn main() {
-    // TODO read parameters and variations from a file
-    match read_input_file() {
-        Ok(storage) => todo!(),
-        Err(e) => println!("No input file found: {}", e),
-    };
+    // TODO get this into the loop
+    //
+    // TODO if no input file exists, continue with manual looping input
+    let storage: Vec<Parameter> = create_storage().expect("Error processing input from file");
+
+    // TODO double use of variable container
+    let container: BTreeMap<&String,&Vec<String>> = create_container(&storage);
+
 
     loop {
         let parameters: Vec<Parameter> = cycle_inputs();

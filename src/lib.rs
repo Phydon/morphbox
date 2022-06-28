@@ -91,24 +91,36 @@ pub fn read_input_file() -> Result<Vec<String>> {
         storage.push(line.unwrap());
     }
 
-    Ok(store)
+    Ok(storage)
 }
 
-// TODO
-// pub fn seperat_strings(storage: Vec<String>) -> Vec<Parameter> {
-//     let mut parameters: Vec<Parameter> = Vec::new();
+pub fn seperat_strings(storage: Vec<String>) -> Vec<Parameter> {
+    let mut parameters: Vec<Parameter> = Vec::new();
 
-//     for item in storage {
-//         // split string by seperator (" ", ",", "-") into vec
+    for item in storage {
+        let mut temp_vec: Vec<&str> = item.split(",").collect();
 
-//         let parameter_name: String;
-//         let variations: Vec<String>;
+        let parameter_name: String = temp_vec.remove(0).to_string();
+        let mut variations: Vec<String> = Vec::new();
 
-//         let param = Parameter::new(parameter_name, variations);
-//         parameters.push(param);
+        for word in temp_vec {
+            variations.push(word.to_string());
+        }
+
+        let param = Parameter::new(parameter_name, variations);
+        parameters.push(param);
         
-//     }
-// }
+    }
+
+    parameters
+}
+
+pub fn create_storage() -> Result<Vec<Parameter>> {
+    let storage = read_input_file()?;
+    let seperate_storage = seperat_strings(storage);
+
+    Ok(seperate_storage)
+}
 
 pub fn create_container(parameters: &Vec<Parameter>) -> BTreeMap<&String, &Vec<String>> {
     let mut container: BTreeMap<_,_> = BTreeMap::new();
