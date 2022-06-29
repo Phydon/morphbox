@@ -1,20 +1,19 @@
-#[macro_use] 
+#[macro_use]
 extern crate prettytable;
 
-use prettytable::{Table, Row, Cell, format};
 use chrono::Local;
+use prettytable::{format, Cell, Row, Table};
 
-use std::{
-    io::{self, Write, BufReader, Result, prelude::* },
-    fs,
-    collections::BTreeMap,
-};
 use itertools::Itertools;
-
+use std::{
+    collections::BTreeMap,
+    fs,
+    io::{self, prelude::*, BufReader, Result, Write},
+};
 
 const FILEPATH: &str = "./mymorphbox.txt";
-// TODO change input file path to ./tests/input_test.txt
-const INPUT_FILE_PATH: &str = "./input_test.txt";
+// TODO ask user for filepath, than process it
+const INPUT_FILE_PATH: &str = "./tests/input_test.txt";
 
 #[derive(Debug)]
 pub struct Parameter {
@@ -30,18 +29,20 @@ impl Parameter {
         let name = word;
         let variations = var;
 
-        Parameter {name, variations}
+        Parameter { name, variations }
     }
 }
 
 pub fn input() -> String {
-        println!("Enter \"Q\" when you`re done");
-        println!("Enter a parameter: ");
+    println!("Enter \"Q\" when you`re done");
+    println!("Enter a parameter: ");
 
-        let mut inp = String::new();
-        io::stdin().read_line(&mut inp).expect("Failed to read input");
+    let mut inp = String::new();
+    io::stdin()
+        .read_line(&mut inp)
+        .expect("Failed to read input");
 
-        return inp.trim().to_string()
+    return inp.trim().to_string();
 }
 
 pub fn input_variations() -> Vec<String> {
@@ -51,7 +52,9 @@ pub fn input_variations() -> Vec<String> {
         println!("Enter a variation: ");
 
         let mut inp = String::new();
-        io::stdin().read_line(&mut inp).expect("Failed to read input");
+        io::stdin()
+            .read_line(&mut inp)
+            .expect("Failed to read input");
 
         match inp.trim() {
             "q" | "Q" => return container,
@@ -74,15 +77,13 @@ pub fn cycle_inputs() -> Vec<Parameter> {
 
         let param = Parameter::new(parameter_name, variations);
         parameters.push(param);
-    };
+    }
 
     parameters
 }
 
 pub fn read_input_file() -> Result<Vec<String>> {
-    let file = fs::OpenOptions::new()
-        .read(true)
-        .open(INPUT_FILE_PATH)?;
+    let file = fs::OpenOptions::new().read(true).open(INPUT_FILE_PATH)?;
 
     let reader = BufReader::new(file);
     let mut storage: Vec<String> = Vec::new();
@@ -109,12 +110,12 @@ pub fn seperat_strings(storage: Vec<String>) -> Vec<Parameter> {
 
         let param = Parameter::new(parameter_name, variations);
         parameters.push(param);
-        
     }
 
     parameters
 }
 
+// process input file
 pub fn create_storage() -> Result<Vec<Parameter>> {
     let storage = read_input_file()?;
     let seperate_storage = seperat_strings(storage);
@@ -123,7 +124,7 @@ pub fn create_storage() -> Result<Vec<Parameter>> {
 }
 
 pub fn create_container(parameters: &Vec<Parameter>) -> BTreeMap<&String, &Vec<String>> {
-    let mut container: BTreeMap<_,_> = BTreeMap::new();
+    let mut container: BTreeMap<_, _> = BTreeMap::new();
 
     for parameter in parameters {
         container.insert(&parameter.name, &parameter.variations);
@@ -142,24 +143,46 @@ pub fn create_table(container: BTreeMap<&String, &Vec<String>>) -> Table {
     let mut table = Table::new();
 
     table.set_format(*format::consts::FORMAT_BOX_CHARS);
-    table.set_titles(Row::new(vec![
-            Cell::new("MORPHBOX")
-                .style_spec("FrBdH3bc")]));
-    table.add_row(Row::new(vec![
-            Cell::new(&datetime)
-                .style_spec("FcH3ic")]));
+    table.set_titles(Row::new(vec![Cell::new("MORPHBOX").style_spec("FrBdH3bc")]));
+    table.add_row(Row::new(vec![Cell::new(&datetime).style_spec("FcH3ic")]));
     table.add_row(row![FdBwl->"INDEX", FdBwc->"PARAMETER", FdBwc->"VARIATIONS"]);
 
     for (key, values) in &container {
         let mut temp_str: String = String::new();
         for value in values.into_iter() {
-            temp_str = temp_str + value + &" | ".to_string(); 
+            temp_str = temp_str + value + &" | ".to_string();
         }
         table.add_row(row![Fy->idx, b->key, c->temp_str]);
         idx += 1;
     }
 
     table
+}
+
+// create all possible combinations
+// output can be ridiculously huge
+// TODO let user filter out unrealistic combinations to reduce the output
+pub fn combine(lst: Vec<Parameter>) -> BTreeMap<i64, Vec<String>> {
+    let mut all_variations: Vec<Vec<String>> = Vec::new();
+
+    for parameter in lst {
+        let var = parameter.variations;
+        all_variations.push(var);
+    }
+
+    let mut multi_prod = all_variations.into_iter().multi_cartesian_product();
+
+    println!("Combinations: ");
+
+    let mut comb_container: BTreeMap<_, _> = BTreeMap::new();
+    let mut idx: i64 = 0;
+    while let Some(n) = multi_prod.next() {
+        println!("{}: {:?}", idx, n);
+        comb_container.insert(idx, n);
+        idx += 1;
+    }
+
+    comb_container
 }
 
 pub fn write_to_file(table: &Table, lst: &BTreeMap<i64, Vec<String>>) -> io::Result<()> {
@@ -182,37 +205,16 @@ pub fn are_u_done() -> bool {
         println!("Press \"Y\" to quit or \"N\" to make changes!");
 
         let mut input = String::new();
-        io::stdin().read_line(&mut input).expect("Failed to read input");
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read input");
 
         match input.trim().to_uppercase().as_str() {
             "y" | "Y" => return true,
             "n" | "N" => return false,
             _ => {
                 println!("Not valid");
-            },
+            }
         }
     }
-}
-
-pub fn combine(lst: Vec<Parameter>) -> BTreeMap<i64, Vec<String>>{
-    let mut all_variations: Vec<Vec<String>> = Vec::new();
-
-    for parameter in lst {
-        let var = parameter.variations;
-        all_variations.push(var);
-    }
-
-    let mut multi_prod = all_variations.into_iter().multi_cartesian_product();
-
-    println!("Combinations: ");
-
-    let mut comb_container: BTreeMap<_,_> = BTreeMap::new();
-    let mut idx: i64 = 0;
-    while let Some(n) = multi_prod.next() {
-        println!("{}: {:?}", idx, n);
-        comb_container.insert(idx, n);
-        idx += 1;
-    }
-
-    comb_container
 }

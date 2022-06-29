@@ -8,27 +8,29 @@ use std::{
 use morphbox::*;
 
 fn main() {
-    // TODO get this into the loop
-    //
-    // TODO if no input file exists, continue with manual looping input
-    let storage: Vec<Parameter> = create_storage().expect("Error processing input from file");
-
-    // TODO double use of variable container
-    let container: BTreeMap<&String,&Vec<String>> = create_container(&storage);
-
-
     loop {
-        let parameters: Vec<Parameter> = cycle_inputs();
-        // for param in &parameters {
-        //     println!("name: {}", param.name);
-        //     println!("variations: {:?}", param.variations);
-        // }
+        let mut parameters: Vec<Parameter> = Vec::new();
+        let mut no_file: bool = true;
+
+        // read parameters and variations from a file
+        // TODO ask user for filepath -> than process it
+        match create_storage() {
+            Ok(storage) => {
+                no_file = false;
+                parameters = storage;
+            },
+            _ => {
+                println!("Unable to process parameters and variations from file\n");
+            }
+        }
+
+        // if no file was given, manually enter parameters and variations
+        if no_file {
+            println!("Enter parameters and variations manually:\n");
+            parameters = cycle_inputs();
+        }
 
         let container: BTreeMap<&String,&Vec<String>> = create_container(&parameters);
-        // for (key, value) in container {
-        //     println!("key: {key}");
-        //     println!("value: {:?}", value);
-        // }
 
         let table: Table = create_table(container);
 
