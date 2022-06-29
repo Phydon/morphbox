@@ -177,6 +177,7 @@ pub fn combine(lst: Vec<Parameter>) -> BTreeMap<String, Vec<String>> {
     let mut idx: u64 = 0;
     while let Some(n) = multi_prod.next() {
         // println!("{}: {:?}", idx, n);
+        // TODO key: parameter, value: variations
         comb_container.insert(idx.to_string(), n);
         idx += 1;
     }
