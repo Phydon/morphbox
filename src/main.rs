@@ -7,6 +7,9 @@ use std::{
 
 use morphbox::*;
 
+const FILEPATH_TABLE: &str = "./mymorphbox.csv";
+const FILEPATH_COMBINATIONS: &str = "./mycombinations.csv";
+
 fn main() {
     loop {
         let mut parameters: Vec<Parameter> = Vec::new();
@@ -34,11 +37,17 @@ fn main() {
 
         let table: Table = create_table(container);
 
+        // TODO fix for large tables
+        // width to big 
+        //      -> doesn`t fit to screen
+        //      -> doesn`t fit into file
+        // TODO choose proper file format
         table.printstd();
         let lst = combine(parameters);
 
         if are_u_done() {
-            write_to_file(&table, &lst).expect("Failed to write to file");
+            write_table_to_file(FILEPATH_TABLE, &table).expect("Failed to write table to file"); 
+            write_combinations_to_file(FILEPATH_COMBINATIONS, &lst).expect("Failed to write combinations to file"); 
             break;
         }
     }
