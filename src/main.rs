@@ -23,7 +23,8 @@ fn main() {
                 parameters = storage;
             },
             _ => {
-                println!("Unable to process parameters and variations from file\n");
+                println!("Unable to process parameters and variations from 
+                    file\n");
             }
         }
 
@@ -33,7 +34,8 @@ fn main() {
             parameters = cycle_inputs();
         }
 
-        let container: BTreeMap<&String,&Vec<String>> = create_container(&parameters);
+        let container: BTreeMap<&String,&Vec<String>> = 
+            create_container(&parameters);
 
         let table: Table = create_table(container);
 
@@ -46,8 +48,10 @@ fn main() {
         let lst = combine(parameters);
 
         if are_u_done() {
-            write_table_to_file(FILEPATH_TABLE, &table).expect("Failed to write table to file"); 
-            write_combinations_to_file(FILEPATH_COMBINATIONS, &lst).expect("Failed to write combinations to file"); 
+            write_table_to_file(FILEPATH_TABLE, &table)
+                .expect("Failed to write table to file"); 
+            write_combinations_to_file(FILEPATH_COMBINATIONS, &lst)
+                .expect("Failed to write combinations to file"); 
             break;
         }
     }

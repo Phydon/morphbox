@@ -11,6 +11,7 @@ use std::{
     io::{self, prelude::*, BufReader, Result, Write},
 };
 
+
 // TODO ask user for filepath, than process it
 const INPUT_FILE_PATH: &str = "./tests/input_test.csv";
 
@@ -114,7 +115,7 @@ pub fn seperat_strings(storage: Vec<String>) -> Vec<Parameter> {
     parameters
 }
 
-// process input file
+// process/transfrom input file
 pub fn create_storage() -> Result<Vec<Parameter>> {
     let storage = read_input_file()?;
     let seperate_storage = seperat_strings(storage);
