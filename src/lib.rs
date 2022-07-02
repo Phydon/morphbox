@@ -95,6 +95,7 @@ pub fn read_input_file() -> Result<Vec<String>> {
     Ok(storage)
 }
 
+// seperates the parameter from the variations
 pub fn seperat_strings(storage: Vec<String>) -> Vec<Parameter> {
     let mut parameters: Vec<Parameter> = Vec::new();
 
@@ -171,8 +172,6 @@ pub fn combine(lst: Vec<Parameter>) -> BTreeMap<String, Vec<String>> {
     }
 
     let mut multi_prod = all_variations.into_iter().multi_cartesian_product();
-
-    println!("Combinations: ");
 
     let mut comb_container: BTreeMap<_, _> = BTreeMap::new();
     let mut idx: u64 = 0;

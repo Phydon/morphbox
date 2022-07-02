@@ -39,3 +39,20 @@ fn create_table_panic_test() {
     let empty_storage: BTreeMap<_,_> = BTreeMap::new();
     let _empty_table = create_table(empty_storage);
 }
+
+#[test]
+fn combine_test() {
+    let param_a = Parameter::new("A".to_string(), vec!["aa".to_string(), "aaa".to_string()]);
+    let param_b = Parameter::new("B".to_string(), vec!["bb".to_string(), "bbb".to_string()]);
+    let mut vec_par: Vec<Parameter> = Vec::new();
+    vec_par.push(param_a);
+    vec_par.push(param_b);
+
+    let comb: BTreeMap<String, Vec<String>> = combine(vec_par);
+    // println!("{:?}", comb);
+
+    assert_eq!(comb.get(&"0".to_string()), Some(&vec!["aa".to_string(), "bb".to_string()]));
+    assert_eq!(comb.get(&"1".to_string()), Some(&vec!["aa".to_string(), "bbb".to_string()]));
+    assert_eq!(comb.get(&"2".to_string()), Some(&vec!["aaa".to_string(), "bb".to_string()]));
+    assert_eq!(comb.get(&"3".to_string()), Some(&vec!["aaa".to_string(), "bbb".to_string()]));
+}
