@@ -10,6 +10,11 @@ use morphbox::*;
 const FILEPATH_TABLE: &str = "./mymorphbox.csv";
 const FILEPATH_COMBINATIONS: &str = "./mycombinations.csv";
 
+// TODO limit the number of parameters <= 8 ???
+// and variations <= 8 ???
+// both in the input file and the manual input,
+// otherwise a huge file will be generated and it takes forever 
+// to calculate combinations and write o file
 fn main() {
     loop {
         let mut parameters: Vec<Parameter> = Vec::new();

@@ -3,10 +3,12 @@ extern crate prettytable;
 
 use chrono::Local;
 use prettytable::{format, Cell, Row, Table};
+use indicatif::{ProgressBar, ProgressStyle};
 
 use itertools::Itertools;
 use std::{
     collections::BTreeMap,
+    cmp::min,
     fs,
     io::{self, prelude::*, BufReader, Result, Write},
 };
@@ -160,10 +162,22 @@ pub fn create_table(container: BTreeMap<&String, &Vec<String>>) -> Table {
     table
 }
 
+// async?
+fn progress_bar(end: u64) -> ProgressBar {
+    let pb = ProgressBar::new(end);
+    pb.set_style(ProgressStyle::default_bar()
+        .template("{spinner:.green} [{wide_bar:.cyan/blue}] ({eta})")
+        .progress_chars("#>-"));
+
+    pb
+}
+
 // create all possible combinations
-// output can be ridiculously huge
+// output can be ridiculously huge => LIMIT IT
 // TODO let user filter out unrealistic combinations to reduce the output
 pub fn combine(lst: Vec<Parameter>) -> BTreeMap<String, Vec<String>> {
+    println!("Calculating combinations ...");
+
     let mut all_variations: Vec<Vec<String>> = Vec::new();
 
     for parameter in lst {
@@ -173,14 +187,25 @@ pub fn combine(lst: Vec<Parameter>) -> BTreeMap<String, Vec<String>> {
 
     let mut multi_prod = all_variations.into_iter().multi_cartesian_product();
 
+    let len = multi_prod.clone().count() as u64;
+    let pb = progress_bar(len);
+
     let mut comb_container: BTreeMap<_, _> = BTreeMap::new();
     let mut idx: u64 = 0;
+
     while let Some(n) = multi_prod.next() {
         // println!("{}: {:?}", idx, n);
-        // TODO key: parameter, value: variations
+
+        let new = min(idx, len);
+        if idx % 10 == 0 {
+            pb.set_position(new);
+        }
+
         comb_container.insert(idx.to_string(), n);
         idx += 1;
     }
+
+    pb.finish_with_message("done");
 
     comb_container
 }
@@ -196,18 +221,32 @@ pub fn write_table_to_file(file: &str, table: &Table) -> io::Result<()> {
     Ok(())
 }
 
-// TODO enter spinners while file is written
-// can take a moment
+// TODO can take a moment
 // async?
+// TODO sort the list by (index?)
 pub fn write_combinations_to_file(file: &str, lst: &BTreeMap<String, Vec<String>>) -> io::Result<()> {
     let mut file = fs::OpenOptions::new()
         .write(true)
         .create(true)
         .open(file)?;
 
+    println!("Generating csv file ...");
+
+    let len = lst.len() as u64;
+    let pb = progress_bar(len);
+    let mut idx: u64 = 0;
+
     for (k, v) in lst {
         writeln!(file, "{}: {:?}", k, v)?;
+
+        let new = min(idx + 1, len);
+        idx = new;
+        if idx % 10 == 0 {
+            pb.set_position(new);
+        }
     }
+
+    pb.finish_with_message("done");
 
     Ok(())
 }
