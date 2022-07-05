@@ -4,8 +4,8 @@ extern crate prettytable;
 use chrono::Local;
 use prettytable::{format, Cell, Row, Table};
 use indicatif::{ProgressBar, ProgressStyle};
-
 use itertools::Itertools;
+
 use std::{
     collections::BTreeMap,
     cmp::min,
@@ -49,6 +49,7 @@ pub fn input() -> String {
 
 pub fn input_variations() -> Vec<String> {
     let mut container: Vec<String> = Vec::new();
+
     loop {
         println!("Enter \"Q\" when you`re done");
         println!("Enter a variation: ");
@@ -103,8 +104,8 @@ pub fn seperat_strings(storage: Vec<String>) -> Vec<Parameter> {
 
     for item in storage {
         let mut temp_vec: Vec<&str> = item.split(",").collect();
-
         let parameter_name: String = temp_vec.remove(0).to_string();
+
         let mut variations: Vec<String> = Vec::new();
 
         for word in temp_vec {
@@ -174,8 +175,8 @@ fn progress_bar(end: u64) -> ProgressBar {
 
 // create all possible combinations
 // output can be ridiculously huge => LIMIT IT
-// TODO let user filter out unrealistic combinations to reduce the output
-pub fn combine(lst: Vec<Parameter>) -> BTreeMap<String, Vec<String>> {
+// TODO let user filter out unrealistic combinations to reduce the output -> How?
+pub fn combine(lst: Vec<Parameter>) -> BTreeMap<u64, Vec<String>> {
     println!("Calculating combinations ...");
 
     let mut all_variations: Vec<Vec<String>> = Vec::new();
@@ -191,7 +192,7 @@ pub fn combine(lst: Vec<Parameter>) -> BTreeMap<String, Vec<String>> {
     let pb = progress_bar(len);
 
     let mut comb_container: BTreeMap<_, _> = BTreeMap::new();
-    let mut idx: u64 = 0;
+    let mut idx: u64 = 1;
 
     while let Some(n) = multi_prod.next() {
         // println!("{}: {:?}", idx, n);
@@ -201,7 +202,7 @@ pub fn combine(lst: Vec<Parameter>) -> BTreeMap<String, Vec<String>> {
             pb.set_position(new);
         }
 
-        comb_container.insert(idx.to_string(), n);
+        comb_container.insert(idx, n);
         idx += 1;
     }
 
@@ -224,7 +225,7 @@ pub fn write_table_to_file(file: &str, table: &Table) -> io::Result<()> {
 // TODO can take a moment
 // async?
 // TODO sort the list by (index?)
-pub fn write_combinations_to_file(file: &str, lst: &BTreeMap<String, Vec<String>>) -> io::Result<()> {
+pub fn write_combinations_to_file(file: &str, lst: &BTreeMap<u64, Vec<String>>) -> io::Result<()> {
     let mut file = fs::OpenOptions::new()
         .write(true)
         .create(true)
@@ -250,6 +251,7 @@ pub fn write_combinations_to_file(file: &str, lst: &BTreeMap<String, Vec<String>
 
     Ok(())
 }
+
 pub fn are_u_done() -> bool {
     loop {
         println!("Done?");
