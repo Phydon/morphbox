@@ -15,7 +15,7 @@ use std::{
 
 
 // TODO ask user for filepath, than process it
-const INPUT_FILE_PATH: &str = "./tests/input_test.csv";
+const INPUT_FILE_PATH: &str = "./input/input_test.csv";
 
 #[derive(Debug)]
 pub struct Parameter {

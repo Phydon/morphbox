@@ -1,8 +1,0 @@
-mechanism drive,mechanical,electrical,pneumatical,hydraulically
-material,wood,metal,ceramics,glas,paper,synthetic
-weight,maximal,minimal,light,heavy
-dimensions,height,width,depth
-stress,mechanic,thermal,bio,chemical,noise,electrical,magnetical,climate
-mounting,manually,automatically
-safety/standards,none,iso,din,eu
-material,wood,metal,ceramics,glas,paper,synthetic
