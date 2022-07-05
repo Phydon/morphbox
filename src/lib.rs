@@ -176,7 +176,7 @@ fn progress_bar(end: u64) -> ProgressBar {
 // create all possible combinations
 // output can be ridiculously huge => LIMIT IT
 // TODO let user filter out unrealistic combinations to reduce the output -> How?
-pub fn combine(lst: Vec<Parameter>) -> BTreeMap<u64, Vec<String>> {
+pub fn combine(lst: Vec<Parameter>) -> Vec<String> {
     println!("Calculating combinations ...");
 
     let mut all_variations: Vec<Vec<String>> = Vec::new();
@@ -191,10 +191,10 @@ pub fn combine(lst: Vec<Parameter>) -> BTreeMap<u64, Vec<String>> {
     let len = multi_prod.clone().count() as u64;
     let pb = progress_bar(len);
 
-    let mut comb_container: BTreeMap<_, _> = BTreeMap::new();
-    let mut idx: u64 = 1;
+    let mut comb_container: Vec<String> = Vec::new();
+    let mut idx: u64 = 0;
 
-    while let Some(n) = multi_prod.next() {
+    while let Some(var) = multi_prod.next() {
         // println!("{}: {:?}", idx, n);
 
         let new = min(idx, len);
@@ -202,7 +202,9 @@ pub fn combine(lst: Vec<Parameter>) -> BTreeMap<u64, Vec<String>> {
             pb.set_position(new);
         }
 
-        comb_container.insert(idx, n);
+        let var_str: String = var.join(",");
+
+        comb_container.push(var_str);
         idx += 1;
     }
 
@@ -211,11 +213,14 @@ pub fn combine(lst: Vec<Parameter>) -> BTreeMap<u64, Vec<String>> {
     comb_container
 }
 
-pub fn write_table_to_file(file: &str, table: &Table) -> io::Result<()> {
+pub fn write_table_to_file(path: &str, table: &Table) -> io::Result<()> {
+    let datetime = Local::now().to_string();
+    let new_path = "./output/".to_string() + &datetime + "_" + path ;
+
     let mut file = fs::OpenOptions::new()
         .write(true)
         .create(true)
-        .open(file)?;
+        .open(new_path)?;
 
     writeln!(file, "{}", table)?;
 
@@ -225,11 +230,14 @@ pub fn write_table_to_file(file: &str, table: &Table) -> io::Result<()> {
 // TODO can take a moment
 // async?
 // TODO sort the list by (index?)
-pub fn write_combinations_to_file(file: &str, lst: &BTreeMap<u64, Vec<String>>) -> io::Result<()> {
+pub fn write_combinations_to_file(path: &str, lst: &Vec<String>) -> io::Result<()> {
+    let datetime = Local::now().to_string();
+    let new_path = "./output/".to_string() + &datetime + "_" + path ;
+
     let mut file = fs::OpenOptions::new()
         .write(true)
         .create(true)
-        .open(file)?;
+        .open(new_path)?;
 
     println!("Generating csv file ...");
 
@@ -237,8 +245,8 @@ pub fn write_combinations_to_file(file: &str, lst: &BTreeMap<u64, Vec<String>>) 
     let pb = progress_bar(len);
     let mut idx: u64 = 0;
 
-    for (k, v) in lst {
-        writeln!(file, "{}: {:?}", k, v)?;
+    for v in lst {
+        writeln!(file, "{v}")?;
 
         let new = min(idx + 1, len);
         idx = new;

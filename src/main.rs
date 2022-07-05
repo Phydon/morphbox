@@ -7,8 +7,8 @@ use std::{
 
 use morphbox::*;
 
-const FILEPATH_TABLE: &str = "./mymorphbox.csv";
-const FILEPATH_COMBINATIONS: &str = "./mycombinations.csv";
+const FILEPATH_TABLE: &str = "mymorphbox.csv";
+const FILEPATH_COMBINATIONS: &str = "mycombinations.csv";
 
 // TODO limit the number of parameters <= 8 ???
 // and variations <= 8 ???
