@@ -14,7 +14,7 @@ const FILEPATH_COMBINATIONS: &str = "mycombinations.csv";
 // and variations <= 8 ???
 // both in the input file and the manual input,
 // otherwise a huge file will be generated and it takes forever 
-// to calculate combinations and write o file
+// to calculate combinations and write to file
 fn main() {
     loop {
         let mut parameters: Vec<Parameter> = Vec::new();
@@ -48,10 +48,18 @@ fn main() {
         // width to big 
         //      -> doesn`t fit to screen
         //      -> doesn`t fit into file
-        // TODO choose proper file format
+        // SOLUTION for variations:: calculate used window size (of the monitor)
+        // calculate max number of possible variations in one line
+        // if limit for a line is reached -> message to user
+        // -> create the same parameter (automate this for the user) and 
+        // start again asking for variations
+        // same for the input file 
+        // -> automatically create a new line with the same parameter
+        // => no solution for max parameters (is this needed??)
         table.printstd();
         let lst = combine(parameters);
 
+        // TODO choose proper file format to display the table
         if are_u_done() {
             write_table_to_file(FILEPATH_TABLE, &table)
                 .expect("Failed to write table to file"); 

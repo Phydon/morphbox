@@ -163,7 +163,6 @@ pub fn create_table(container: BTreeMap<&String, &Vec<String>>) -> Table {
     table
 }
 
-// async?
 fn progress_bar(end: u64) -> ProgressBar {
     let pb = ProgressBar::new(end);
     pb.set_style(ProgressStyle::default_bar()
@@ -178,6 +177,7 @@ fn progress_bar(end: u64) -> ProgressBar {
 // TODO let user filter out unrealistic combinations to reduce the output -> How?
 pub fn combine(lst: Vec<Parameter>) -> Vec<String> {
     println!("Calculating combinations ...");
+    println!("[This may take a while and the program may seem unresponsive]");
 
     let mut all_variations: Vec<Vec<String>> = Vec::new();
 
@@ -214,6 +214,8 @@ pub fn combine(lst: Vec<Parameter>) -> Vec<String> {
 }
 
 pub fn write_table_to_file(path: &str, table: &Table) -> io::Result<()> {
+    println!("Creating table ...");
+
     let datetime = Local::now().to_string();
     let new_path = "./output/".to_string() + &datetime + "_" + path ;
 
@@ -228,8 +230,8 @@ pub fn write_table_to_file(path: &str, table: &Table) -> io::Result<()> {
 }
 
 // TODO can take a moment
+// -> limit input parameters and variations
 // async?
-// TODO sort the list by (index?)
 pub fn write_combinations_to_file(path: &str, lst: &Vec<String>) -> io::Result<()> {
     let datetime = Local::now().to_string();
     let new_path = "./output/".to_string() + &datetime + "_" + path ;
@@ -240,6 +242,7 @@ pub fn write_combinations_to_file(path: &str, lst: &Vec<String>) -> io::Result<(
         .open(new_path)?;
 
     println!("Generating csv file ...");
+    println!("[This may take a while and the program may seem unresponsive]");
 
     let len = lst.len() as u64;
     let pb = progress_bar(len);

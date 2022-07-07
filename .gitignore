@@ -1,4 +1,4 @@
 /target
-/* /output */
-/* /input */
+/output
+/input
 /tests/nutable.csv
