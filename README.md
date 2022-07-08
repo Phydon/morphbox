@@ -5,7 +5,8 @@
 
 # MorphBox #
 
-Morphological Box:: create all possible combinations of parameters and their variations
+[Morphological Box](https://en.wikipedia.org/wiki/Morphological_box):: create all possible combinations of parameters and their variations
+
 
 	| idx |    Parameter    | Variations                          |
 	|:----|:---------------:|-------------------------------------|
