@@ -5,6 +5,7 @@ use chrono::Local;
 use prettytable::{format, Cell, Row, Table};
 use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
+use rand::Rng;
 
 use std::{
     collections::BTreeMap,
@@ -216,6 +217,18 @@ pub fn combine(lst: Vec<Parameter>) -> Vec<String> {
     pb.finish_with_message("done");
 
     comb_container
+}
+
+pub fn generate_random_comb(lst: Vec<String>) -> String {
+    let len = lst.len();
+    let r = rand::thread_rng().gen_range(1..len);
+    let rand_item =  &lst[r];
+
+    rand_item.to_string()
+}
+
+pub fn get_random_comb() {
+    todo!();
 }
 
 pub fn write_table_to_file(path: &str, table: &Table) -> io::Result<()> {
