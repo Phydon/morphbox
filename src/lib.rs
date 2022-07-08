@@ -154,7 +154,11 @@ pub fn create_table(container: BTreeMap<&String, &Vec<String>>) -> Table {
     for (key, values) in &container {
         let mut temp_str: String = String::new();
         for value in values.into_iter() {
-            temp_str = temp_str + value + &" | ".to_string();
+            if value == values.into_iter().last().unwrap() {
+                temp_str = temp_str + value;
+            } else {
+                temp_str = temp_str + value + &" | ".to_string();
+            }
         }
         table.add_row(row![Fy->idx, b->key, c->temp_str]);
         idx += 1;
