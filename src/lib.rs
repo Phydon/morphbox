@@ -127,6 +127,7 @@ pub fn create_storage() -> Result<Vec<Parameter>> {
     Ok(seperate_storage)
 }
 
+// sorted by parameter name
 pub fn create_container(parameters: &Vec<Parameter>) -> BTreeMap<&String, &Vec<String>> {
     let mut container: BTreeMap<_, _> = BTreeMap::new();
 

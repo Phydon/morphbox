@@ -48,11 +48,8 @@ fn combine_test() {
     vec_par.push(param_a);
     vec_par.push(param_b);
 
-    let comb: BTreeMap<String, Vec<String>> = combine(vec_par);
+    let comb: Vec<String> = combine(vec_par);
     // println!("{:?}", comb);
 
-    assert_eq!(comb.get(&"0".to_string()), Some(&vec!["aa".to_string(), "bb".to_string()]));
-    assert_eq!(comb.get(&"1".to_string()), Some(&vec!["aa".to_string(), "bbb".to_string()]));
-    assert_eq!(comb.get(&"2".to_string()), Some(&vec!["aaa".to_string(), "bb".to_string()]));
-    assert_eq!(comb.get(&"3".to_string()), Some(&vec!["aaa".to_string(), "bbb".to_string()]));
+    assert_eq!(comb, ["aa,bb", "aa,bbb", "aaa,bb", "aaa,bbb"]);
 }
