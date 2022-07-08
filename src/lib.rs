@@ -6,6 +6,7 @@ use prettytable::{format, Cell, Row, Table};
 use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
 use rand::Rng;
+use colored::*;
 
 use std::{
     collections::BTreeMap,
@@ -37,7 +38,7 @@ impl Parameter {
 }
 
 pub fn input() -> String {
-    println!("Enter \"Q\" when you`re done");
+    println!("{}", "\nEnter \"Q\" when you`re done".dimmed());
     println!("Enter a parameter: ");
 
     let mut inp = String::new();
@@ -52,7 +53,7 @@ pub fn input_variations() -> Vec<String> {
     let mut container: Vec<String> = Vec::new();
 
     loop {
-        println!("Enter \"Q\" when you`re done");
+        println!("{}", "\nEnter \"Q\" when you`re done".dimmed());
         println!("Enter a variation: ");
 
         let mut inp = String::new();
@@ -182,8 +183,8 @@ fn progress_bar(end: u64) -> ProgressBar {
 // output can be ridiculously huge => LIMIT IT
 // TODO let user filter out unrealistic combinations to reduce the output -> How?
 pub fn combine(lst: Vec<Parameter>) -> Vec<String> {
-    println!("Calculating combinations ...");
-    println!("[This may take a while and the program may seem unresponsive]");
+    println!("{}", "\n::: Calculating combinations ...".green().bold());
+    println!("{}", "[This may take a while and the program may seem unresponsive]".red().dimmed());
 
     let mut all_variations: Vec<Vec<String>> = Vec::new();
 
@@ -219,7 +220,7 @@ pub fn combine(lst: Vec<Parameter>) -> Vec<String> {
     comb_container
 }
 
-pub fn generate_random_comb(lst: Vec<String>) -> String {
+pub fn generate_random_comb(lst: &Vec<String>) -> String {
     let len = lst.len();
     let r = rand::thread_rng().gen_range(1..len);
     let rand_item =  &lst[r];
@@ -227,12 +228,29 @@ pub fn generate_random_comb(lst: Vec<String>) -> String {
     rand_item.to_string()
 }
 
-pub fn get_random_comb() {
-    todo!();
+pub fn get_random_comb() -> bool {
+    loop {
+        println!("\nGenerate a random combination for further analysis?");
+        println!("      [ Y ]     => Yes");
+        println!("      [ N ]     => No");
+
+        let mut input = String::new();
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read input");
+
+        match input.trim().to_uppercase().as_str() {
+            "y" | "Y" => return true,
+            "n" | "N" => return false,
+            _ => {
+                println!("{}", "-> Not valid".red());
+            }
+        }
+    }
 }
 
 pub fn write_table_to_file(path: &str, table: &Table) -> io::Result<()> {
-    println!("Creating table ...");
+    println!("{}", "\n::: Creating table ...".green().bold());
 
     let datetime = Local::now().to_string();
     let new_path = "./output/".to_string() + &datetime + "_" + path ;
@@ -259,8 +277,8 @@ pub fn write_combinations_to_file(path: &str, lst: &Vec<String>) -> io::Result<(
         .create(true)
         .open(new_path)?;
 
-    println!("Generating csv file ...");
-    println!("[This may take a while and the program may seem unresponsive]");
+    println!("{}", "\n::: Generating csv file ...".green().bold());
+    println!("{}", "[This may take a while and the program may seem unresponsive]".red().dimmed());
 
     let len = lst.len() as u64;
     let pb = progress_bar(len);
@@ -283,8 +301,9 @@ pub fn write_combinations_to_file(path: &str, lst: &Vec<String>) -> io::Result<(
 
 pub fn are_u_done() -> bool {
     loop {
-        println!("Done?");
-        println!("Press \"Y\" to quit or \"N\" to make changes!");
+        println!("\nAre you done?");
+        println!("      [ Q ]     => Quit");
+        println!("      [ N ]     => No, make changes");
 
         let mut input = String::new();
         io::stdin()
@@ -292,10 +311,10 @@ pub fn are_u_done() -> bool {
             .expect("Failed to read input");
 
         match input.trim().to_uppercase().as_str() {
-            "y" | "Y" => return true,
+            "q" | "Q" => return true,
             "n" | "N" => return false,
             _ => {
-                println!("Not valid");
+                println!("{}", "-> Not valid".red());
             }
         }
     }

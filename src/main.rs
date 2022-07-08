@@ -1,4 +1,5 @@
 use prettytable::Table;
+use colored::*;
 
 use std::{
     collections::BTreeMap,
@@ -28,8 +29,8 @@ fn main() {
                 parameters = storage;
             },
             _ => {
-                println!("Unable to process parameters and variations from 
-                    file\n");
+                println!("{}", "Unable to process parameters and variations from 
+                    file\n".red());
             }
         }
 
@@ -58,6 +59,16 @@ fn main() {
         // => no solution for max parameters (is this needed??)
         table.printstd();
         let lst = combine(parameters);
+
+        while get_random_comb() {
+            let rand_output = generate_random_comb(&lst);
+            println!("\n  =>  {}\n", rand_output.bold());
+            
+            // TODO options for user:
+            // remove
+            // do something else with the randomly generated combination
+            // todo!();
+        }
 
         // TODO choose proper file format to display the table
         if are_u_done() {
