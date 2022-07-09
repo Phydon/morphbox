@@ -292,17 +292,17 @@ pub fn combine(lst: Vec<Parameter>) -> Vec<String> {
     comb_container
 }
 
-pub fn generate_random_comb(lst: &Vec<String>) -> String {
+pub fn generate_random_comb(lst: &Vec<String>) -> (u64, String) {
     let len = lst.len();
     let r = rand::thread_rng().gen_range(1..len);
     let rand_item =  &lst[r];
 
-    rand_item.to_string()
+    (r as u64, rand_item.to_string())
 }
 
 pub fn get_random_comb() -> bool {
     loop {
-        println!("\nGenerate a random combination for further analysis?");
+        println!("\nGenerate a random combination for further analysis?\n");
         println!("      [ Y ]     => Yes");
         println!("      [ N ]     => No");
 
@@ -311,9 +311,39 @@ pub fn get_random_comb() -> bool {
             .read_line(&mut input)
             .expect("Failed to read input");
 
-        match input.trim().to_uppercase().as_str() {
+        match input.trim() {
             "y" | "Y" => return true,
             "n" | "N" => return false,
+            _ => {
+                eprintln!("{}", "-> Not valid".red());
+            }
+        }
+    }
+}
+
+// TODO Finish store / manipulate, ...
+pub fn comb_user_options(comb: String, lst: &mut Vec<String>, idx: u64) {
+    loop {
+        println!("Options:\n");
+        println!("      [ R ]       => Remove");
+        println!("      [ S ]       => Store");
+        println!("      [ M ]       => Manipulate");
+        println!("      [ C ]       => Continue");
+
+        let mut input = String::new();
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read input");
+
+        match input.trim() {
+            "r" | "R" => {
+                lst.remove(idx as usize);
+                println!("Index {} successfully removed", idx);
+                break;
+            }
+            "s" | "S" => todo!(),
+            "m" | "M" => todo!(),
+            "c" | "C" => break,
             _ => {
                 eprintln!("{}", "-> Not valid".red());
             }
@@ -382,7 +412,7 @@ pub fn are_u_done() -> bool {
             .read_line(&mut input)
             .expect("Failed to read input");
 
-        match input.trim().to_uppercase().as_str() {
+        match input.trim() {
             "q" | "Q" => return true,
             "n" | "N" => return false,
             _ => {
