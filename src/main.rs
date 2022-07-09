@@ -17,6 +17,8 @@ const FILEPATH_COMBINATIONS: &str = "mycombinations.csv";
 // otherwise a huge file will be generated and it takes forever 
 // to calculate combinations and write to file
 fn main() {
+    if welcome_and_stop() { process::exit(1) }
+
     loop {
         let mut parameters: Vec<Parameter> = Vec::new();
         let mut no_file: bool = true;

@@ -122,16 +122,16 @@ pub fn seperat_strings(storage: Vec<String>) -> Vec<Parameter> {
     parameters
 }
 
-// process/transfrom input file
 pub fn create_storage() -> Result<Vec<Parameter>> {
+    // process/transfrom input file
     let storage = read_input_file()?;
     let seperate_storage = seperat_strings(storage);
 
     Ok(seperate_storage)
 }
 
-// sorted by parameter name
 pub fn create_container(parameters: &Vec<Parameter>) -> BTreeMap<&String, &Vec<String>> {
+    // sorted by parameter name
     let mut container: BTreeMap<_, _> = BTreeMap::new();
 
     for parameter in parameters {
@@ -388,6 +388,53 @@ pub fn are_u_done() -> bool {
             _ => {
                 eprintln!("{}", "-> Not valid".red());
             }
+        }
+    }
+}
+
+fn clear_screen() {
+    println!("\x1Bc");
+}
+
+pub fn title() {
+    clear_screen();
+
+    let title: String = "              /\\/\\0RPH|30X".blue().bold().to_string();
+    let mail: String = "        [leann.phydon@gmail.com]".to_string();
+
+    println!("{title}");
+    println!("{}\n", mail.dimmed());
+}
+
+pub fn warning() {
+    let warn_txt: String = "
+WARNING! A big number of input variables (parameters and their variations) 
+can great a huge number of possible combinations to calculate 
+and may produce a huge output file.".to_string();
+    let example: String = "For example: 10 parameters and 10 variations each generate 10.000.000.000 combinations.".to_string();
+    let last_warn_txt: String = "=> You have been warned!".to_string();
+
+    println!("{}", warn_txt.red());
+    println!("{}", example.dimmed());
+    println!("{}\n\n", last_warn_txt.red().bold());
+}
+
+pub fn welcome_and_stop() -> bool {
+    title();
+    warning();
+
+    println!("      [   Q   ]     => Quit");
+    println!("      [ ENTER ]     => Continue");
+
+    let mut input = String::new();
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Failed to read input");
+
+    match input.trim() {
+        "q" | "Q" => return true,
+        _ => {
+            return false;
         }
     }
 }
