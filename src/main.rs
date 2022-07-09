@@ -45,29 +45,18 @@ fn main() {
 
         let table: Table = create_table(container);
 
-        // TODO fix for large tables
-        // width to big 
-        //      -> doesn`t fit to screen
-        //      -> doesn`t fit into file
-        // SOLUTION for variations:: calculate used window size (of the monitor)
-        // calculate max number of possible variations in one line
-        // if limit for a line is reached -> message to user
-        // -> create the same parameter (automate this for the user) and 
-        // start again asking for variations
-        // same for the input file 
-        // -> automatically create a new line with the same parameter
-        // => no solution for max parameters (is this needed??)
         table.printstd();
         let lst = combine(parameters);
 
         while get_random_comb() {
             let rand_output = generate_random_comb(&lst);
+            // TODO pretty print as table
             println!("\n  =>  {}\n", rand_output.bold());
             
             // TODO options for user:
             // remove
             // do something else with the randomly generated combination
-            // todo!();
+            todo!();
         }
 
         // TODO choose proper file format to display the table

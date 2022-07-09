@@ -7,6 +7,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
 use rand::Rng;
 use colored::*;
+use terminal_size::{Width, Height, terminal_size};
 
 use std::{
     collections::BTreeMap,
@@ -140,6 +141,19 @@ pub fn create_container(parameters: &Vec<Parameter>) -> BTreeMap<&String, &Vec<S
     container
 }
 
+fn get_terminal_width() -> u16 {
+    let size = terminal_size();
+    let mut screen_width: u16 = 0;
+
+    if let Some((Width(w), Height(_h))) = size {
+        screen_width = w;
+    } else {
+        eprintln!("{}", "Unable to get terminal size".red())
+    }
+
+     screen_width
+}
+
 pub fn create_table(container: BTreeMap<&String, &Vec<String>>) -> Table {
     if container.is_empty() {
         panic!("No arguments given");
@@ -154,16 +168,74 @@ pub fn create_table(container: BTreeMap<&String, &Vec<String>>) -> Table {
     table.add_row(Row::new(vec![Cell::new(&datetime).style_spec("FcH3ic")]));
     table.add_row(row![FdBwl->"INDEX", FdBwc->"PARAMETER", FdBwc->"VARIATIONS"]);
 
+    // if table width gets to big, it doesn`t fit into the screen
+    // split too long rows into multiple ones 
+    // with the same parameter name and index
+    // TODO split into more than 2 rows if row width is way too big
+    let width = get_terminal_width() / 2;
+
+    // TODO works, but this is a mess -> FIXME
     for (key, values) in &container {
+        // dont`t start at zero to have extra space
+        let mut len: u16 = 20;
+        len += key.len() as u16;
+
+        let mut too_long: bool = false;
         let mut temp_str: String = String::new();
+        let mut temp_vec: Vec<String> = Vec::new();
+        
         for value in values.into_iter() {
-            if value == values.into_iter().last().unwrap() {
-                temp_str = temp_str + value;
-            } else {
-                temp_str = temp_str + value + &" | ".to_string();
+            len += value.len() as u16;
+        }
+
+        if len < width {
+            for value in values.into_iter() {
+                if value == values.into_iter().last().unwrap() {
+                    temp_str += value;
+                } else {
+                    temp_str = temp_str + value + &" | ".to_string();
+                }
+            }
+        } else {
+            too_long = true;
+
+            for value in values.into_iter() {
+                temp_vec.push(value.to_string());
             }
         }
-        table.add_row(row![Fy->idx, b->key, c->temp_str]);
+
+        if too_long {
+            // split value into more rows
+            // under same parameter and index
+            let mut temp_str1: String = String::new();
+            let mut temp_str2: String = String::new();
+
+            let middle = temp_vec.len() / 2;
+            
+            for v1 in &temp_vec[0..middle] {
+                if v1 == temp_vec[0..middle].last().unwrap() {
+                    temp_str1 = temp_str1 + v1;
+                } else {
+                    temp_str1 = temp_str1 + v1 + &" | ".to_string();
+                }
+            }
+
+            table.add_row(row![Fy->idx, b->key, c->temp_str1]);
+            
+            for v2 in &temp_vec[middle..] {
+                if v2 == temp_vec[middle..].last().unwrap() {
+                    temp_str2 += v2;
+                } else {
+                    temp_str2 = temp_str2 + v2 + &" | ".to_string();
+                }
+            }
+
+            table.add_row(row![Fy->idx, b->key, c->temp_str2]);
+
+        } else {
+            table.add_row(row![Fy->idx, b->key, c->temp_str]);
+        }
+
         idx += 1;
     }
 
@@ -243,7 +315,7 @@ pub fn get_random_comb() -> bool {
             "y" | "Y" => return true,
             "n" | "N" => return false,
             _ => {
-                println!("{}", "-> Not valid".red());
+                eprintln!("{}", "-> Not valid".red());
             }
         }
     }
@@ -314,7 +386,7 @@ pub fn are_u_done() -> bool {
             "q" | "Q" => return true,
             "n" | "N" => return false,
             _ => {
-                println!("{}", "-> Not valid".red());
+                eprintln!("{}", "-> Not valid".red());
             }
         }
     }
