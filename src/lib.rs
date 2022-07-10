@@ -2,20 +2,19 @@
 extern crate prettytable;
 
 use chrono::Local;
-use prettytable::{format, Cell, Row, Table};
+use colored::*;
 use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
+use prettytable::{format, Cell, Row, Table};
 use rand::Rng;
-use colored::*;
-use terminal_size::{Width, Height, terminal_size};
+use terminal_size::{terminal_size, Height, Width};
 
 use std::{
-    collections::BTreeMap,
     cmp::min,
+    collections::BTreeMap,
     fs,
     io::{self, prelude::*, BufReader, Result, Write},
 };
-
 
 // TODO ask user for filepath, than process it
 const INPUT_FILE_PATH: &str = "./input/input_test.csv";
@@ -130,7 +129,9 @@ pub fn create_storage() -> Result<Vec<Parameter>> {
     Ok(seperate_storage)
 }
 
-pub fn create_container(parameters: &Vec<Parameter>) -> BTreeMap<&String, &Vec<String>> {
+pub fn create_container(
+    parameters: &Vec<Parameter>,
+) -> BTreeMap<&String, &Vec<String>> {
     // sorted by parameter name
     let mut container: BTreeMap<_, _> = BTreeMap::new();
 
@@ -151,7 +152,7 @@ fn get_terminal_width() -> u16 {
         eprintln!("{}", "Unable to get terminal size".red())
     }
 
-     screen_width
+    screen_width
 }
 
 pub fn create_table(container: BTreeMap<&String, &Vec<String>>) -> Table {
@@ -164,12 +165,15 @@ pub fn create_table(container: BTreeMap<&String, &Vec<String>>) -> Table {
     let mut table = Table::new();
 
     table.set_format(*format::consts::FORMAT_BOX_CHARS);
-    table.set_titles(Row::new(vec![Cell::new("MORPHBOX").style_spec("FrBdH3bc")]));
+    table.set_titles(Row::new(vec![
+        Cell::new("MORPHBOX").style_spec("FrBdH3bc")
+    ]));
     table.add_row(Row::new(vec![Cell::new(&datetime).style_spec("FcH3ic")]));
-    table.add_row(row![FdBwl->"INDEX", FdBwc->"PARAMETER", FdBwc->"VARIATIONS"]);
+    table
+        .add_row(row![FdBwl->"INDEX", FdBwc->"PARAMETER", FdBwc->"VARIATIONS"]);
 
     // if table width gets to big, it doesn`t fit into the screen
-    // split too long rows into multiple ones 
+    // split too long rows into multiple ones
     // with the same parameter name and index
     // TODO split into more than 2 rows if row width is way too big
     let width = get_terminal_width() / 2;
@@ -183,7 +187,7 @@ pub fn create_table(container: BTreeMap<&String, &Vec<String>>) -> Table {
         let mut too_long: bool = false;
         let mut temp_str: String = String::new();
         let mut temp_vec: Vec<String> = Vec::new();
-        
+
         for value in values.into_iter() {
             len += value.len() as u16;
         }
@@ -211,7 +215,7 @@ pub fn create_table(container: BTreeMap<&String, &Vec<String>>) -> Table {
             let mut temp_str2: String = String::new();
 
             let middle = temp_vec.len() / 2;
-            
+
             for v1 in &temp_vec[0..middle] {
                 if v1 == temp_vec[0..middle].last().unwrap() {
                     temp_str1 = temp_str1 + v1;
@@ -221,7 +225,7 @@ pub fn create_table(container: BTreeMap<&String, &Vec<String>>) -> Table {
             }
 
             table.add_row(row![Fy->idx, b->key, c->temp_str1]);
-            
+
             for v2 in &temp_vec[middle..] {
                 if v2 == temp_vec[middle..].last().unwrap() {
                     temp_str2 += v2;
@@ -231,7 +235,6 @@ pub fn create_table(container: BTreeMap<&String, &Vec<String>>) -> Table {
             }
 
             table.add_row(row![Fy->idx, b->key, c->temp_str2]);
-
         } else {
             table.add_row(row![Fy->idx, b->key, c->temp_str]);
         }
@@ -244,9 +247,11 @@ pub fn create_table(container: BTreeMap<&String, &Vec<String>>) -> Table {
 
 fn progress_bar(end: u64) -> ProgressBar {
     let pb = ProgressBar::new(end);
-    pb.set_style(ProgressStyle::default_bar()
-        .template("{spinner:.green} [{wide_bar:.cyan/blue}] ({eta})")
-        .progress_chars("#>-"));
+    pb.set_style(
+        ProgressStyle::default_bar()
+            .template("{spinner:.green} [{wide_bar:.cyan/blue}] ({eta})")
+            .progress_chars("#>-"),
+    );
 
     pb
 }
@@ -256,7 +261,12 @@ fn progress_bar(end: u64) -> ProgressBar {
 // TODO let user filter out unrealistic combinations to reduce the output -> How?
 pub fn combine(lst: Vec<Parameter>) -> Vec<String> {
     println!("{}", "\n::: Calculating combinations ...".green().bold());
-    println!("{}", "[This may take a while and the program may seem unresponsive]".red().dimmed());
+    println!(
+        "{}",
+        "[This may take a while and the program may seem unresponsive]"
+            .red()
+            .dimmed()
+    );
 
     let mut all_variations: Vec<Vec<String>> = Vec::new();
 
@@ -295,7 +305,7 @@ pub fn combine(lst: Vec<Parameter>) -> Vec<String> {
 pub fn generate_random_comb(lst: &Vec<String>) -> (u64, String) {
     let len = lst.len();
     let r = rand::thread_rng().gen_range(1..len);
-    let rand_item =  &lst[r];
+    let rand_item = &lst[r];
 
     (r as u64, rand_item.to_string())
 }
@@ -303,8 +313,8 @@ pub fn generate_random_comb(lst: &Vec<String>) -> (u64, String) {
 pub fn get_random_comb() -> bool {
     loop {
         println!("\nGenerate a random combination for further analysis?\n");
-        println!("      [ Y ]     => Yes");
-        println!("      [ N ]     => No");
+        println!("      [ Y ]       => Yes");
+        println!("      [ N ]       => No");
 
         let mut input = String::new();
         io::stdin()
@@ -355,7 +365,7 @@ pub fn write_table_to_file(path: &str, table: &Table) -> io::Result<()> {
     println!("{}", "\n::: Creating table ...".green().bold());
 
     let datetime = Local::now().to_string();
-    let new_path = "./output/".to_string() + &datetime + "_" + path ;
+    let new_path = "./output/".to_string() + &datetime + "_" + path;
 
     let mut file = fs::OpenOptions::new()
         .write(true)
@@ -370,9 +380,12 @@ pub fn write_table_to_file(path: &str, table: &Table) -> io::Result<()> {
 // TODO can take a moment
 // -> limit input parameters and variations
 // async?
-pub fn write_combinations_to_file(path: &str, lst: &Vec<String>) -> io::Result<()> {
+pub fn write_combinations_to_file(
+    path: &str,
+    lst: &Vec<String>,
+) -> io::Result<()> {
     let datetime = Local::now().to_string();
-    let new_path = "./output/".to_string() + &datetime + "_" + path ;
+    let new_path = "./output/".to_string() + &datetime + "_" + path;
 
     let mut file = fs::OpenOptions::new()
         .write(true)
@@ -380,7 +393,12 @@ pub fn write_combinations_to_file(path: &str, lst: &Vec<String>) -> io::Result<(
         .open(new_path)?;
 
     println!("{}", "\n::: Generating csv file ...".green().bold());
-    println!("{}", "[This may take a while and the program may seem unresponsive]".red().dimmed());
+    println!(
+        "{}",
+        "[This may take a while and the program may seem unresponsive]"
+            .red()
+            .dimmed()
+    );
 
     let len = lst.len() as u64;
     let pb = progress_bar(len);
@@ -429,7 +447,8 @@ fn clear_screen() {
 pub fn title() {
     clear_screen();
 
-    let title: String = "              /\\/\\0RPH|30X".blue().bold().to_string();
+    let title: String =
+        "              /\\/\\0RPH|30X".blue().bold().to_string();
     let mail: String = "        [leann.phydon@gmail.com]".to_string();
 
     println!("{title}");
@@ -438,11 +457,17 @@ pub fn title() {
 
 pub fn warning() {
     let warn_txt: String = "
-WARNING! A big number of input variables (parameters and their variations) 
-can great a huge number of possible combinations to calculate 
-and may produce a huge output file.".to_string();
-    let example: String = "For example: 10 parameters and 10 variations each generate 10.000.000.000 combinations.".to_string();
-    let last_warn_txt: String = "=> You have been warned!".to_string();
+WARNING! A big number of input variables 
+(parameters and their variations) can 
+great a huge number of possible combinations 
+to calculate and may produce a huge output 
+file."
+        .to_string();
+    let example: String = "Example: 
+    10 parameters and 10 variations each 
+    generate 10.000.000.000 combinations."
+        .to_string();
+    let last_warn_txt: String = "You have been warned!".to_string();
 
     println!("{}", warn_txt.red());
     println!("{}", example.dimmed());
