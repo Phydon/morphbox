@@ -51,12 +51,13 @@ fn main() {
         let table: Table = create_table(container);
 
         table.printstd();
-        let mut lst = combine(parameters);
+        let mut lst = combine(&parameters);
 
         while get_random_comb() {
             let (idx, rand_output) = generate_random_comb(&lst);
             // TODO pretty print as table
-            println!("\n  =>  {}\n", rand_output.bold());
+            pretty_print_random_comb(&parameters, &rand_output);
+            // println!("\n  =>  {}\n", rand_output.bold());
 
             // TODO options for user:
             comb_user_options(rand_output, &mut lst, idx);

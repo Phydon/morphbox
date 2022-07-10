@@ -259,7 +259,7 @@ fn progress_bar(end: u64) -> ProgressBar {
 // create all possible combinations
 // output can be ridiculously huge => LIMIT IT
 // TODO let user filter out unrealistic combinations to reduce the output -> How?
-pub fn combine(lst: Vec<Parameter>) -> Vec<String> {
+pub fn combine(lst: &Vec<Parameter>) -> Vec<String> {
     println!("{}", "\n::: Calculating combinations ...".green().bold());
     println!(
         "{}",
@@ -271,8 +271,8 @@ pub fn combine(lst: Vec<Parameter>) -> Vec<String> {
     let mut all_variations: Vec<Vec<String>> = Vec::new();
 
     for parameter in lst {
-        let var = parameter.variations;
-        all_variations.push(var);
+        let var = &parameter.variations;
+        all_variations.push(var.to_vec());
     }
 
     let mut multi_prod = all_variations.into_iter().multi_cartesian_product();
@@ -302,14 +302,6 @@ pub fn combine(lst: Vec<Parameter>) -> Vec<String> {
     comb_container
 }
 
-pub fn generate_random_comb(lst: &Vec<String>) -> (u64, String) {
-    let len = lst.len();
-    let r = rand::thread_rng().gen_range(1..len);
-    let rand_item = &lst[r];
-
-    (r as u64, rand_item.to_string())
-}
-
 pub fn get_random_comb() -> bool {
     loop {
         println!("\nGenerate a random combination for further analysis?\n");
@@ -331,6 +323,47 @@ pub fn get_random_comb() -> bool {
     }
 }
 
+pub fn generate_random_comb(lst: &Vec<String>) -> (u64, String) {
+    let len = lst.len();
+    let r = rand::thread_rng().gen_range(1..len);
+    let rand_item = &lst[r];
+
+    (r as u64, rand_item.to_string())
+}
+
+pub fn pretty_print_random_comb(param: &Vec<Parameter>, comb: &String) {
+    let comb_storage: Vec<&str> = comb.split(",").collect();
+
+    let mut param_storage: Vec<&str> = Vec::new();
+    for p in param {
+        param_storage.push(&p.name);
+    }
+
+    let mut k = 0;
+    let mut map: Vec<(&str,&str)> = Vec::new();
+    for pair in comb_storage.into_iter().map(|comb| {k += 1; (param_storage[k - 1], comb)}) {
+        map.push(pair);
+    }
+    map.sort();
+
+    let mut table = Table::new();
+    table.set_format(*format::consts::FORMAT_BOX_CHARS);
+    table
+        .add_row(row![FdBwl->"INDEX", FdBwc->"PARAMETER", FdBwc->"VARIATIONS"]);
+
+    let mut i: u8 = 0;
+    for (k, v) in map {
+        let idx: &str = &i.to_string();
+        table.add_row(Row::new(vec![
+                Cell::new(idx).style_spec("Fy"),
+                Cell::new(&k).style_spec("cb"),
+                Cell::new(&v).style_spec("cb")]));
+        i += 1;
+    }
+    
+    table.printstd(); 
+}
+
 // TODO Finish store / manipulate, ...
 pub fn comb_user_options(comb: String, lst: &mut Vec<String>, idx: u64) {
     loop {
@@ -348,7 +381,7 @@ pub fn comb_user_options(comb: String, lst: &mut Vec<String>, idx: u64) {
         match input.trim() {
             "r" | "R" => {
                 lst.remove(idx as usize);
-                println!("Index {} successfully removed", idx);
+                println!("Index {} successfully removed", idx.to_string().green().bold());
                 break;
             }
             "s" | "S" => todo!(),
