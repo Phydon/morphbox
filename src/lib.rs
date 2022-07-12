@@ -87,7 +87,28 @@ pub fn cycle_inputs() -> Vec<Parameter> {
     parameters
 }
 
-pub fn read_input_file() -> Result<Vec<String>> {
+pub fn ask_for_file() -> bool {
+    loop {
+        println!("\nRead data from a file?");
+        println!("      [ F ]     => use FILE");
+        println!("      [ M ]     => enter data MANUALLY");
+
+        let mut input = String::new();
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read input");
+
+        match input.trim() {
+            "f" | "F" => return true,
+            "m" | "M" => return false,
+            _ => {
+                eprintln!("{}", "-> Not valid".red());
+            }
+        }
+    }
+}
+
+fn read_input_file() -> Result<Vec<String>> {
     let file = fs::OpenOptions::new().read(true).open(INPUT_FILE_PATH)?;
 
     let reader = BufReader::new(file);
@@ -101,7 +122,7 @@ pub fn read_input_file() -> Result<Vec<String>> {
 }
 
 // seperates the parameter from the variations
-pub fn seperat_strings(storage: Vec<String>) -> Vec<Parameter> {
+fn seperat_strings(storage: Vec<String>) -> Vec<Parameter> {
     let mut parameters: Vec<Parameter> = Vec::new();
 
     for item in storage {
@@ -121,7 +142,7 @@ pub fn seperat_strings(storage: Vec<String>) -> Vec<Parameter> {
     parameters
 }
 
-pub fn create_storage() -> Result<Vec<Parameter>> {
+pub fn create_storage_from_file() -> Result<Vec<Parameter>> {
     // process/transfrom input file
     let storage = read_input_file()?;
     let seperate_storage = seperat_strings(storage);
@@ -325,6 +346,13 @@ pub fn get_random_comb() -> bool {
 
 pub fn generate_random_comb(lst: &Vec<String>) -> (u64, String) {
     let len = lst.len();
+
+    if lst.is_empty() || len == 1 {
+        let warn: &str = "There is no data left to process.";
+        eprintln!("{}", warn.red());
+        return (0, "NoData".to_string())
+    }
+
     let r = rand::thread_rng().gen_range(1..len);
     let rand_item = &lst[r];
 
@@ -381,7 +409,7 @@ pub fn comb_user_options(comb: String, lst: &mut Vec<String>, idx: u64) {
         match input.trim() {
             "r" | "R" => {
                 lst.remove(idx as usize);
-                println!("Index {} successfully removed", idx.to_string().green().bold());
+                println!("Combination index {} successfully removed", idx.to_string().green().bold());
                 break;
             }
             "s" | "S" => todo!(),

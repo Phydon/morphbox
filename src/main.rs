@@ -24,18 +24,20 @@ fn main() {
 
         // read parameters and variations from a file
         // TODO ask user for filepath -> than process it
-        match create_storage() {
-            Ok(storage) => {
-                no_file = false;
-                parameters = storage;
-            }
-            _ => {
-                println!(
-                    "{}",
-                    "Unable to process parameters and variations from 
-                    file\n"
-                        .red()
-                );
+        if ask_for_file() {
+            match create_storage_from_file() {
+                Ok(storage) => {
+                    no_file = false;
+                    parameters = storage;
+                }
+                _ => {
+                    println!(
+                        "{}",
+                        "Unable to process parameters and variations from 
+                        file\n"
+                            .red()
+                    );
+                }
             }
         }
 
@@ -55,12 +57,16 @@ fn main() {
 
         while get_random_comb() {
             let (idx, rand_output) = generate_random_comb(&lst);
-            // TODO pretty print as table
-            pretty_print_random_comb(&parameters, &rand_output);
-            // println!("\n  =>  {}\n", rand_output.bold());
 
-            // TODO options for user:
-            comb_user_options(rand_output, &mut lst, idx);
+            if idx == 0 && rand_output == "NoData" {
+                break;
+            } else {
+                pretty_print_random_comb(&parameters, &rand_output);
+                // println!("\n  =>  {}\n", rand_output.bold());
+
+                // TODO more options for user:
+                comb_user_options(rand_output, &mut lst, idx);
+            }
         }
 
         // TODO choose proper file format to display the table
