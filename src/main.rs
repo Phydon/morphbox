@@ -24,7 +24,7 @@ fn main() {
 
         // read parameters and variations from a file
         // TODO ask user for filepath -> than process it
-        if ask_for_file() {
+        if input_from_file() {
             match create_storage_from_file() {
                 Ok(storage) => {
                     no_file = false;
@@ -61,6 +61,7 @@ fn main() {
             if idx == 0 && rand_output == "NoData" {
                 break;
             } else {
+                println!("Combination Index:: {}", idx.to_string().blue().bold());
                 pretty_print_random_comb(&parameters, &rand_output);
                 // println!("\n  =>  {}\n", rand_output.bold());
 

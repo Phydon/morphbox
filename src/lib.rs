@@ -87,7 +87,7 @@ pub fn cycle_inputs() -> Vec<Parameter> {
     parameters
 }
 
-pub fn ask_for_file() -> bool {
+pub fn input_from_file() -> bool {
     loop {
         println!("\nRead data from a file?");
         println!("      [ F ]     => use FILE");
@@ -108,8 +108,8 @@ pub fn ask_for_file() -> bool {
     }
 }
 
-fn read_input_file() -> Result<Vec<String>> {
-    let file = fs::OpenOptions::new().read(true).open(INPUT_FILE_PATH)?;
+fn read_input_file(path: &str) -> Result<Vec<String>> {
+    let file = fs::OpenOptions::new().read(true).open(path)?;
 
     let reader = BufReader::new(file);
     let mut storage: Vec<String> = Vec::new();
@@ -142,9 +142,42 @@ fn seperat_strings(storage: Vec<String>) -> Vec<Parameter> {
     parameters
 }
 
+// TODO not pretty -> FIXME
+fn ask_user_for_file() -> String {
+    loop {
+        println!(
+            "\nEnter a path to a file or hit \"ENTER\" to 
+            continue with the file in the input folder."
+        );
+        let note: &str =
+            "Enter the whole path. \"~\" is not allowed in the path.";
+        println!("{}", note.dimmed());
+        let user_path: &str = "path_to_file";
+        println!(
+            "      [ {} ]    => enter a path to the file",
+            user_path.italic()
+        );
+        println!("      [ ENTER ]           => use file from input folder");
+
+        let mut input = String::new();
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read input");
+
+        match input.trim() {
+            "" => return INPUT_FILE_PATH.to_string(),
+            _ => return input.trim().to_string(),
+        }
+    }
+}
+
 pub fn create_storage_from_file() -> Result<Vec<Parameter>> {
-    // process/transfrom input file
-    let storage = read_input_file()?;
+    // let user enter a path to file or use file in input folder
+    let path: String = ask_user_for_file();
+    println!("{:?}", path);
+    // process input file
+    let storage = read_input_file(path.as_str())?;
+    // transform input file
     let seperate_storage = seperat_strings(storage);
 
     Ok(seperate_storage)
@@ -266,8 +299,8 @@ pub fn create_table(container: BTreeMap<&String, &Vec<String>>) -> Table {
     table
 }
 
-fn progress_bar(end: u64) -> ProgressBar {
-    let pb = ProgressBar::new(end);
+fn progress_bar(end: &u64) -> ProgressBar {
+    let pb = ProgressBar::new(*end);
     pb.set_style(
         ProgressStyle::default_bar()
             .template("{spinner:.green} [{wide_bar:.cyan/blue}] ({eta})")
@@ -285,7 +318,6 @@ pub fn combine(lst: &Vec<Parameter>) -> Vec<String> {
     println!(
         "{}",
         "[This may take a while and the program may seem unresponsive]"
-            .red()
             .dimmed()
     );
 
@@ -299,7 +331,7 @@ pub fn combine(lst: &Vec<Parameter>) -> Vec<String> {
     let mut multi_prod = all_variations.into_iter().multi_cartesian_product();
 
     let len = multi_prod.clone().count() as u64;
-    let pb = progress_bar(len);
+    let pb = progress_bar(&len);
 
     let mut comb_container: Vec<String> = Vec::new();
     let mut idx: u64 = 0;
@@ -319,6 +351,10 @@ pub fn combine(lst: &Vec<Parameter>) -> Vec<String> {
     }
 
     pb.finish_with_message("done");
+    println!(
+        "{} combinations calculated.",
+        len.to_string().green().bold()
+    );
 
     comb_container
 }
@@ -350,7 +386,7 @@ pub fn generate_random_comb(lst: &Vec<String>) -> (u64, String) {
     if lst.is_empty() || len == 1 {
         let warn: &str = "There is no data left to process.";
         eprintln!("{}", warn.red());
-        return (0, "NoData".to_string())
+        return (0, "NoData".to_string());
     }
 
     let r = rand::thread_rng().gen_range(1..len);
@@ -368,8 +404,11 @@ pub fn pretty_print_random_comb(param: &Vec<Parameter>, comb: &String) {
     }
 
     let mut k = 0;
-    let mut map: Vec<(&str,&str)> = Vec::new();
-    for pair in comb_storage.into_iter().map(|comb| {k += 1; (param_storage[k - 1], comb)}) {
+    let mut map: Vec<(&str, &str)> = Vec::new();
+    for pair in comb_storage.into_iter().map(|comb| {
+        k += 1;
+        (param_storage[k - 1], comb)
+    }) {
         map.push(pair);
     }
     map.sort();
@@ -383,13 +422,14 @@ pub fn pretty_print_random_comb(param: &Vec<Parameter>, comb: &String) {
     for (k, v) in map {
         let idx: &str = &i.to_string();
         table.add_row(Row::new(vec![
-                Cell::new(idx).style_spec("Fy"),
-                Cell::new(&k).style_spec("cb"),
-                Cell::new(&v).style_spec("cb")]));
+            Cell::new(idx).style_spec("Fy"),
+            Cell::new(&k).style_spec("cb"),
+            Cell::new(&v).style_spec("cb"),
+        ]));
         i += 1;
     }
-    
-    table.printstd(); 
+
+    table.printstd();
 }
 
 // TODO Finish store / manipulate, ...
@@ -409,7 +449,10 @@ pub fn comb_user_options(comb: String, lst: &mut Vec<String>, idx: u64) {
         match input.trim() {
             "r" | "R" => {
                 lst.remove(idx as usize);
-                println!("Combination index {} successfully removed", idx.to_string().green().bold());
+                println!(
+                    "\nCombination index {} successfully removed",
+                    idx.to_string().green().bold()
+                );
                 break;
             }
             "s" | "S" => todo!(),
@@ -462,7 +505,7 @@ pub fn write_combinations_to_file(
     );
 
     let len = lst.len() as u64;
-    let pb = progress_bar(len);
+    let pb = progress_bar(&len);
     let mut idx: u64 = 0;
 
     for v in lst {
