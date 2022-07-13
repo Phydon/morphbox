@@ -48,7 +48,7 @@ fn combine_test() {
     vec_par.push(param_a);
     vec_par.push(param_b);
 
-    let comb: Vec<String> = combine(vec_par);
+    let comb: Vec<String> = combine(&vec_par);
     // println!("{:?}", comb);
 
     assert_eq!(comb, ["aa,bb", "aa,bbb", "aaa,bb", "aaa,bbb"]);
