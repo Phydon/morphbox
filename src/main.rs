@@ -7,6 +7,7 @@ use morphbox::*;
 
 const FILEPATH_TABLE: &str = "mymorphbox.txt";
 const FILEPATH_COMBINATIONS: &str = "mycombinations.csv";
+const FILEPATH_STORAGE: &str = "mystorage.csv";
 
 // TODO limit the number of parameters <= 8 ???
 // and variations <= 8 ???
@@ -53,10 +54,11 @@ fn main() {
         let table: Table = create_table(container);
 
         table.printstd();
-        let mut lst = combine(&parameters);
+        let mut comb_lst = combine(&parameters);
+        let mut future_comb_storage: Vec<String> = Vec::new();
 
         while get_random_comb() {
-            let (idx, rand_output) = generate_random_comb(&lst);
+            let (idx, rand_output) = generate_random_comb(&comb_lst);
 
             if idx == 0 && rand_output == "NoData" {
                 break;
@@ -66,7 +68,7 @@ fn main() {
                 // println!("\n  =>  {}\n", rand_output.bold());
 
                 // TODO more options for user:
-                comb_user_options(rand_output, &mut lst, idx);
+                comb_user_options(rand_output, &mut comb_lst, idx, &mut future_comb_storage);
             }
         }
 
@@ -74,8 +76,10 @@ fn main() {
         if are_u_done() {
             write_table_to_file(FILEPATH_TABLE, &table)
                 .expect("Failed to write table to file");
-            write_combinations_to_file(FILEPATH_COMBINATIONS, &lst)
+            write_combinations_to_file(FILEPATH_COMBINATIONS, &comb_lst)
                 .expect("Failed to write combinations to file");
+            write_future_comb_storage_to_file(FILEPATH_STORAGE, &future_comb_storage)
+                .expect("Failed to write storage to file");
             break;
         }
     }

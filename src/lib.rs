@@ -433,7 +433,7 @@ pub fn pretty_print_random_comb(param: &Vec<Parameter>, comb: &String) {
 }
 
 // TODO Finish store / manipulate, ...
-pub fn comb_user_options(comb: String, lst: &mut Vec<String>, idx: u64) {
+pub fn comb_user_options(comb: String, comb_lst: &mut Vec<String>, idx: u64, future_comb_storage: &mut Vec<String>) {
     loop {
         println!("Options:\n");
         println!("      [ R ]       => Remove");
@@ -448,14 +448,21 @@ pub fn comb_user_options(comb: String, lst: &mut Vec<String>, idx: u64) {
 
         match input.trim() {
             "r" | "R" => {
-                lst.remove(idx as usize);
+                comb_lst.remove(idx as usize);
                 println!(
                     "\nCombination index {} successfully removed",
                     idx.to_string().green().bold()
                 );
                 break;
             }
-            "s" | "S" => todo!(),
+            "s" | "S" => {
+                future_comb_storage.push(comb);
+                println!(
+                    "\nCombination index {} has been stored", 
+                    idx.to_string().green().bold()
+                );
+                break;
+            }
             "m" | "M" => todo!(),
             "c" | "C" => break,
             _ => {
@@ -503,6 +510,39 @@ pub fn write_combinations_to_file(
             .red()
             .dimmed()
     );
+
+    let len = lst.len() as u64;
+    let pb = progress_bar(&len);
+    let mut idx: u64 = 0;
+
+    for v in lst {
+        writeln!(file, "{v}")?;
+
+        let new = min(idx + 1, len);
+        idx = new;
+        if idx % 10 == 0 {
+            pb.set_position(new);
+        }
+    }
+
+    pb.finish_with_message("done");
+
+    Ok(())
+}
+
+pub fn write_future_comb_storage_to_file(
+    path: &str,
+    lst: &Vec<String>,
+) -> io::Result<()> {
+    let datetime = Local::now().to_string();
+    let new_path = "./output/".to_string() + &datetime + "_" + path;
+
+    let mut file = fs::OpenOptions::new()
+        .write(true)
+        .create(true)
+        .open(new_path)?;
+
+    println!("{}", "\n::: Generating storage file ...".green().bold());
 
     let len = lst.len() as u64;
     let pb = progress_bar(&len);
