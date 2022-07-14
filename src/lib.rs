@@ -312,7 +312,8 @@ fn progress_bar(end: &u64) -> ProgressBar {
 
 // create all possible combinations
 // output can be ridiculously huge => LIMIT IT
-// TODO let user filter out unrealistic combinations to reduce the output -> How?
+// TODO let user filter out unrealistic combinations to reduce the output ->
+// TODO transform into iterator + closure -> filter out stuff
 pub fn combine(lst: &Vec<Parameter>) -> Vec<String> {
     println!("{}", "\n::: Calculating combinations ...".green().bold());
     println!(
@@ -438,7 +439,7 @@ pub fn comb_user_options(comb: String, comb_lst: &mut Vec<String>, idx: u64, fut
         println!("Options:\n");
         println!("      [ R ]       => Remove");
         println!("      [ S ]       => Store");
-        println!("      [ M ]       => Manipulate");
+        println!("      [ M ]       => Manipulate & Store");
         println!("      [ C ]       => Continue");
 
         let mut input = String::new();
@@ -463,11 +464,45 @@ pub fn comb_user_options(comb: String, comb_lst: &mut Vec<String>, idx: u64, fut
                 );
                 break;
             }
-            "m" | "M" => todo!(),
+            "m" | "M" => manipulate_random_comb(&comb, future_comb_storage),
             "c" | "C" => break,
             _ => {
                 eprintln!("{}", "-> Not valid".red());
             }
+        }
+    }
+}
+
+// FIXME removes and manipulates the wrong index -> why?
+fn manipulate_random_comb(comb: &String, future_comb_storage: &mut Vec<String>) {
+    let mut puppet: Vec<_> = comb.split(",").into_iter().collect();
+    
+    loop {
+        println!("Enter index to change:");
+        let mut input_idx = String::new();
+        io::stdin()
+            .read_line(&mut input_idx)
+            .expect("Failed to read input");
+        let idx: u8 = input_idx.trim().parse::<u8>().expect("Unable to process input");
+
+        if idx > (puppet.len() as u8) - 1 {
+            eprintln!("{}", "-> Not valid".red());
+        } else {
+            println!("Change the variation:");
+            let mut input_str = String::new();
+            io::stdin()
+                .read_line(&mut input_str)
+                .expect("Failed to read input");
+
+            puppet.remove(idx as usize);
+            puppet.insert(idx as usize, input_str.trim());
+
+            future_comb_storage.push(puppet.join(","));
+            println!(
+                "\nCombination has been stored"
+            );
+
+            break;
         }
     }
 }
