@@ -507,10 +507,15 @@ fn manipulate_random_comb(comb: &String, future_comb_storage: &mut Vec<String>) 
     }
 }
 
+fn get_date_and_time() -> String {
+    // ":" in filename doesn`t work on windows
+    Local::now().to_string().replace(":", "_")
+}
+
 pub fn write_table_to_file(path: &str, table: &Table) -> io::Result<()> {
     println!("{}", "\n::: Creating table ...".green().bold());
 
-    let datetime = Local::now().to_string();
+    let datetime = get_date_and_time();
     let new_path = "./output/".to_string() + &datetime + "_" + path;
 
     let mut file = fs::OpenOptions::new()
@@ -530,7 +535,7 @@ pub fn write_combinations_to_file(
     path: &str,
     lst: &Vec<String>,
 ) -> io::Result<()> {
-    let datetime = Local::now().to_string();
+    let datetime = get_date_and_time();
     let new_path = "./output/".to_string() + &datetime + "_" + path;
 
     let mut file = fs::OpenOptions::new()
@@ -542,7 +547,6 @@ pub fn write_combinations_to_file(
     println!(
         "{}",
         "[This may take a while and the program may seem unresponsive]"
-            .red()
             .dimmed()
     );
 
@@ -569,7 +573,7 @@ pub fn write_future_comb_storage_to_file(
     path: &str,
     lst: &Vec<String>,
 ) -> io::Result<()> {
-    let datetime = Local::now().to_string();
+    let datetime = get_date_and_time();
     let new_path = "./output/".to_string() + &datetime + "_" + path;
 
     let mut file = fs::OpenOptions::new()
