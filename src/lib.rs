@@ -516,7 +516,7 @@ pub fn write_table_to_file(path: &str, table: &Table) -> io::Result<()> {
     println!("{}", "\n::: Creating table ...".green().bold());
 
     let datetime = get_date_and_time();
-    let new_path = "./output/".to_string() + &datetime + "_" + path;
+    let new_path = "./".to_string() + &datetime + "_" + path;
 
     let mut file = fs::OpenOptions::new()
         .write(true)
@@ -536,7 +536,7 @@ pub fn write_combinations_to_file(
     lst: &Vec<String>,
 ) -> io::Result<()> {
     let datetime = get_date_and_time();
-    let new_path = "./output/".to_string() + &datetime + "_" + path;
+    let new_path = "./".to_string() + &datetime + "_" + path;
 
     let mut file = fs::OpenOptions::new()
         .write(true)
@@ -574,7 +574,7 @@ pub fn write_future_comb_storage_to_file(
     lst: &Vec<String>,
 ) -> io::Result<()> {
     let datetime = get_date_and_time();
-    let new_path = "./output/".to_string() + &datetime + "_" + path;
+    let new_path = "./".to_string() + &datetime + "_" + path;
 
     let mut file = fs::OpenOptions::new()
         .write(true)
